@@ -1,0 +1,254 @@
+{
+    "search_queries": [
+        {
+        "feature_type": "place_to_visit",
+        "feature_value": "Paris",
+        "search_query": "Best time to visit Paris for tourists travel guide"
+        },
+        {
+        "feature_type": "cuisine_preferences",
+        "feature_value": "local food",
+        "search_query": "Most authentic local food restaurants in Paris for tourists"
+        },
+        {
+        "feature_type": "cuisine_preferences",
+        "feature_value": "wine",
+        "search_query": "Best wine tasting experiences in Paris for tourists"
+        },
+        {
+        "feature_type": "place_preferences",
+        "feature_value": "museums",
+        "search_query": "Must-visit museums in Paris with opening hours and ticket prices"
+        },
+        {
+        "feature_type": "place_preferences",
+        "feature_value": "historical sites",
+        "search_query": "Top historical sites and landmarks to visit in Paris"
+        },
+        {
+        "feature_type": "transport_preferences",
+        "feature_value": "public transport",
+        "search_query": "Paris public transportation guide metro bus tickets for tourists"
+        },
+        {
+        "feature_type": "duration_days",
+        "feature_value": 7,
+        "search_query": "Perfect 7 day Paris itinerary for first-time visitors"
+        },
+        {
+        "feature_type": "place_to_visit",
+        "feature_value": "Rome",
+        "search_query": "Best neighborhoods to stay in Rome for tourists"
+        },
+        {
+        "feature_type": "cuisine_preferences",
+        "feature_value": "pasta",
+        "search_query": "Best authentic pasta restaurants in Rome recommended by locals"
+        },
+        {
+        "feature_type": "cuisine_preferences",
+        "feature_value": "gelato",
+        "search_query": "Where to find the best artisanal gelato in Rome"
+        },
+        {
+        "feature_type": "place_preferences", 
+        "feature_value": "Colosseum",
+        "search_query": "Colosseum Rome visiting tips skip line tickets best time"
+        },
+        {
+        "feature_type": "place_preferences",
+        "feature_value": "Vatican",
+        "search_query": "Vatican museums Sistine Chapel tour guide tickets best times to visit"
+        },
+        {
+        "feature_type": "place_to_visit",
+        "feature_value": "Tokyo",
+        "search_query": "Tokyo travel guide essentials for foreign tourists"
+        },
+        {
+        "feature_type": "cuisine_preferences",
+        "feature_value": "sushi",
+        "search_query": "Best sushi restaurants in Tokyo for different budgets"
+        },
+        {
+        "feature_type": "cuisine_preferences",
+        "feature_value": "ramen",
+        "search_query": "Top-rated authentic ramen shops in Tokyo recommended by locals"
+        },
+        {
+        "feature_type": "place_preferences",
+        "feature_value": "theme parks",
+        "search_query": "Best theme parks to visit in Tokyo and surrounding areas"
+        },
+        {
+        "feature_type": "transport_preferences",
+        "feature_value": "train",
+        "search_query": "Tokyo train system guide JR pass metro for tourists explained"
+        },
+        {
+        "feature_type": "place_to_visit",
+        "feature_value": "New York",
+        "search_query": "Best areas to stay in New York City for tourists"
+        },
+        {
+        "feature_type": "place_preferences",
+        "feature_value": "Broadway shows",
+        "search_query": "How to get cheap Broadway show tickets in New York"
+        },
+        {
+        "feature_type": "place_preferences",
+        "feature_value": "Central Park",
+        "search_query": "Must-see attractions and activities in Central Park New York"
+        },
+        {
+        "feature_type": "transport_preferences",
+        "feature_value": "subway",
+        "search_query": "New York City subway map guide for tourists MetroCard tips"
+        },
+        {
+        "feature_type": "cuisine_preferences",
+        "feature_value": "pizza",
+        "search_query": "Where to find the best authentic New York style pizza"
+        },
+        {
+        "feature_type": "place_to_visit",
+        "feature_value": "Kyoto",
+        "search_query": "Kyoto travel guide best seasons to visit cultural etiquette"
+        },
+        {
+        "feature_type": "cuisine_preferences",
+        "feature_value": "traditional Japanese cuisine",
+        "search_query": "Traditional kaiseki and Japanese cuisine restaurants in Kyoto"
+        },
+        {
+        "feature_type": "cuisine_preferences",
+        "feature_value": "matcha",
+        "search_query": "Best matcha tea houses and cafes in Kyoto for authentic experience"
+        },
+        {
+        "feature_type": "place_preferences",
+        "feature_value": "temples",
+        "search_query": "Most beautiful temples to visit in Kyoto opening hours entrance fees"
+        },
+        {
+        "feature_type": "place_preferences",
+        "feature_value": "gardens",
+        "search_query": "Famous Japanese gardens in Kyoto best times to visit"
+        },
+        {
+        "feature_type": "transport_preferences",
+        "feature_value": "rental car",
+        "search_query": "Driving in Kyoto rental car tips parking information for tourists"
+        },
+        {
+        "feature_type": "place_to_visit",
+        "feature_value": "Bali",
+        "search_query": "Bali Indonesia travel guide best time to visit for tourists"
+        },
+        {
+        "feature_type": "place_preferences",
+        "feature_value": "beaches",
+        "search_query": "Best beaches in Bali for swimming and sunbathing"
+        },
+        {
+        "feature_type": "place_preferences",
+        "feature_value": "water sports",
+        "search_query": "Top water sports activities and schools in Bali surfing diving"
+        },
+        {
+        "feature_type": "place_to_visit",
+        "feature_value": "Bangkok",
+        "search_query": "Bangkok travel guide safety tips for first-time visitors"
+        },
+        {
+        "feature_type": "cuisine_preferences",
+        "feature_value": "Thai food",
+        "search_query": "Authentic Thai food restaurants in Bangkok recommended by locals"
+        },
+        {
+        "feature_type": "cuisine_preferences",
+        "feature_value": "street food",
+        "search_query": "Best street food markets and stalls in Bangkok to try"
+        },
+        {
+        "feature_type": "place_preferences",
+        "feature_value": "night markets",
+        "search_query": "Most popular night markets in Bangkok shopping and food guide"
+        },
+        {
+        "feature_type": "place_to_visit",
+        "feature_value": "Amsterdam",
+        "search_query": "Amsterdam travel guide tips for first-time visitors"
+        },
+        {
+        "feature_type": "place_preferences",
+        "feature_value": "canals",
+        "search_query": "Best canal tours and cruises in Amsterdam prices and routes"
+        },
+        {
+        "feature_type": "place_preferences",
+        "feature_value": "parks",
+        "search_query": "Most beautiful parks and green spaces to visit in Amsterdam"
+        },
+        {
+        "feature_type": "transport_preferences",
+        "feature_value": "bicycle",
+        "search_query": "Amsterdam bicycle rental tips routes and safety for tourists"
+        },
+        {
+        "feature_type": "transport_preferences",
+        "feature_value": "tram",
+        "search_query": "Amsterdam tram system map ticket options for tourists guide"
+        },
+        {
+        "feature_type": "place_to_visit",
+        "feature_value": "London",
+        "search_query": "London travel guide best time to visit weather tips"
+        },
+        {
+        "feature_type": "cuisine_preferences",
+        "feature_value": "afternoon tea",
+        "search_query": "Best places for traditional afternoon tea experience in London"
+        },
+        {
+        "feature_type": "cuisine_preferences",
+        "feature_value": "fish and chips",
+        "search_query": "Authentic fish and chips shops in London recommended by locals"
+        },
+        {
+        "feature_type": "place_preferences",
+        "feature_value": "Big Ben",
+        "search_query": "Visiting Big Ben and Houses of Parliament in London guide"
+        },
+        {
+        "feature_type": "place_preferences",
+        "feature_value": "Tower of London",
+        "search_query": "Tower of London visitor guide tickets tours crown jewels"
+        },
+        {
+        "feature_type": "transport_preferences",
+        "feature_value": "Underground",
+        "search_query": "London Underground Tube map Oyster card guide for tourists"
+        },
+        {
+        "feature_type": "place_to_visit",
+        "feature_value": "Venice",
+        "search_query": "Best time to visit Venice Italy avoiding crowds and floods"
+        },
+        {
+        "feature_type": "transport_preferences",
+        "feature_value": "gondola",
+        "search_query": "Venice gondola ride prices routes best time booking tips"
+        },
+        {
+        "feature_type": "duration_days",
+        "feature_value": 3,
+        "search_query": "Perfect 3 day Venice itinerary must-see attractions"
+        },
+        {
+        "feature_type": "place_to_visit",
+        "feature_value": "Santorini",
+        "search_query": "Santorini Greece travel guide best time to visit for honeymoon"
+        }
+    ]
+}
