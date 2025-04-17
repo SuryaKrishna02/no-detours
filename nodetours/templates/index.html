@@ -1,0 +1,79 @@
+<!-- templates/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NoDetours - Personalized Travel Planner</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='/css/styles.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <h1>NoDetours</h1>
+                <p>Your AI Travel Planning Assistant</p>
+            </div>
+        </header>
+
+        <main>
+            <div class="input-section">
+                <h2>Tell me about your travel plans</h2>
+                <form id="travel-form">
+                    <textarea id="user-input" placeholder="I'm planning a trip to Chicago for 4 days in June with my family. We enjoy museums, parks, and trying local food. We'll be traveling with two kids (ages 8 and 12)."></textarea>
+                    <button type="submit" id="submit-btn">
+                        <i class="fas fa-paper-plane"></i> Create Travel Plan
+                    </button>
+                </form>
+            </div>
+
+            <div class="results-section" id="results">
+                <div class="loading-indicator" id="loading">
+                    <div class="spinner"></div>
+                    <p>Planning your perfect trip...</p>
+                </div>
+                
+                <div class="tabs">
+                    <button class="tab-btn active" data-tab="itinerary">
+                        <i class="fas fa-map-marked-alt"></i> Itinerary
+                    </button>
+                    <button class="tab-btn" data-tab="packing">
+                        <i class="fas fa-suitcase"></i> Packing List
+                    </button>
+                    <button class="tab-btn" data-tab="budget">
+                        <i class="fas fa-wallet"></i> Budget
+                    </button>
+                </div>
+                
+                <div class="tab-content">
+                    <div class="tab-pane active" id="itinerary-content">
+                        <div class="content-wrapper">
+                            <h3>Your Travel Itinerary</h3>
+                            <div class="itinerary-content" id="itinerary-text"></div>
+                        </div>
+                    </div>
+                    <div class="tab-pane" id="packing-content">
+                        <div class="content-wrapper">
+                            <h3>Packing Recommendations</h3>
+                            <div class="packing-list" id="packing-text"></div>
+                        </div>
+                    </div>
+                    <div class="tab-pane" id="budget-content">
+                        <div class="content-wrapper">
+                            <h3>Budget Estimate</h3>
+                            <div class="budget-content" id="budget-text"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <p>NoDetours &copy; 2025 | Powered by Claude AI</p>
+        </footer>
+    </div>
+
+    <script src="{{ url_for('static', path='/js/app.js') }}"></script>
+</body>
+</html>
