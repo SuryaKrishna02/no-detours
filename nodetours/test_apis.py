@@ -50,10 +50,14 @@ def test_search_api():
     
     search_api = SearchAPI()
     
-    test_queries = [
-        "top attractions in Rome",
-        "best restaurants in Tokyo"
-    ]
+    # test_queries = [
+    #     "top attractions in Rome",
+    #     "best restaurants in Tokyo"
+    # ]
+    test_queries1 =['Chicago top attractions and must-see places', 'Chicago weather in June', 'Family-friendly activities in Chicago']
+    # test_queries =[ 'Best museums to visit in Chicago', 'Top parks in Chicago for families', 'Local food options for families in Chicago', 'Transportation options in Chicago for families']
+    test_queries = [str(x) for x in test_queries1]
+    # print(test_queries)
     
     for query in test_queries:
         print(f"\nTesting search for: {query}")
