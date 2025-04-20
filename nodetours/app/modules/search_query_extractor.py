@@ -2,7 +2,7 @@
 import json
 import logging
 import re
-from typing import Dict, Any
+from typing import Dict, Any, List, Optional, Union
 from api.llm_provider import LLMProvider
 
 # Set up logging
@@ -20,25 +20,37 @@ class SearchQueryExtractor:
         Extract relevant travel features from user input.
         
         Returns:
-            Dict with extracted features like destination, dates, preferences, etc.
+            Dict with extracted features like place_to_visit, duration_days, cuisine_preferences, etc.
         """
         logger.info("Extracting travel features from user input")
-        
+
+        # First try to extract using LLM
+        try:
+            features = self._extract_with_llm(user_input)
+            logger.info(f"Successfully extracted features with LLM: {features}")
+            return features
+        except Exception as e:
+            logger.error(f"Error in LLM feature extraction: {e}", exc_info=True)
+            
+            # Fallback to regex-based extraction
+            features = self._extract_features_fallback(user_input)
+            logger.info(f"Extracted features with fallback: {features}")
+            return features
+    
+    def _extract_with_llm(self, user_input: str) -> Dict[str, Any]:
+        """Extract features using LLM."""
         system_prompt = """
         You are a feature extraction system for a travel planning assistant.
         Your task is to identify and extract key travel information from user input.
-        Return a JSON object with the following fields (leave empty if not present):
+        Return a JSON object with the following fields:
         
-        - destination: The main travel destination (city, country, or location)
-        - dates: Travel dates (start and end)
-        - duration: Length of stay (in days)
-        - preferences: List of activities or themes the user wants (nature, culture, food, etc.)
-        - constraints: Any limitations (budget, accessibility, etc.)
-        - transportation: Preferred mode of transport
-        - accommodation: Preferred type of lodging
-        - weather_concerns: If the user mentions weather preferences or concerns
-        - travel_group: Who is traveling (solo, couple, family with kids, etc.)
+        - place_to_visit: The main travel destination (city, country, or location) - REQUIRED
+        - duration_days: Length of stay as an integer (e.g., 7) - Optional, can be null
+        - cuisine_preferences: List of food and drink preferences - Optional, can be null
+        - place_preferences: List of activity or place preferences (museums, beaches, etc.) - Optional, can be null
+        - transport_preferences: Preferred mode of transport - Optional, can be null
         
+        For any fields not mentioned in the input, use null.
         Provide only the JSON, with no additional text.
         """
         
@@ -46,73 +58,115 @@ class SearchQueryExtractor:
         Extract travel features from the following user input:
         
         {user_input}
+        
+        IMPORTANT: For place_to_visit, this field is REQUIRED. If it is not specified in the user input, 
+        provide a reasonable assumption based on context.
         """
         
+        extracted_features = self.llm_provider.generate(
+            system_prompt=system_prompt,
+            user_prompt=user_prompt
+        )
+        
+        logger.info(f"Received LLM response: {extracted_features[:100]}...")
+        
+        # Try to parse JSON
         try:
-            logger.info("Sending feature extraction request to LLM")
-            extracted_features = self.llm_provider.generate(
-                system_prompt=system_prompt,
-                user_prompt=user_prompt
-            )
+            features = json.loads(extracted_features)
+            logger.info(f"Successfully parsed features: {features}")
             
-            logger.info(f"Received LLM response: {extracted_features[:100]}...")
+            # Validate and ensure required fields have values
+            features = self._validate_and_fill_features(features, user_input)
             
-            # Try to parse JSON
-            try:
-                return json.loads(extracted_features)
-            except json.JSONDecodeError as e:
-                logger.error(f"Failed to parse JSON: {e}", exc_info=True)
-                
-                # Try to extract JSON from the response (in case LLM added text)
-                json_pattern = r'(\{[\s\S]*\})'
-                match = re.search(json_pattern, extracted_features)
-                
-                if match:
-                    try:
-                        logger.info("Attempting to extract JSON from response")
-                        return json.loads(match.group(1))
-                    except json.JSONDecodeError:
-                        logger.error("Failed to parse extracted JSON", exc_info=True)
-                
-                # Manual extraction as fallback
-                return self._extract_features_fallback(user_input)
-        
-        except Exception as e:
-            logger.error(f"Error in feature extraction: {e}", exc_info=True)
-            return self._extract_features_fallback(user_input)
+            return features
+        except json.JSONDecodeError as e:
+            logger.error(f"Failed to parse JSON: {e}", exc_info=True)
+            
+            # Try to extract JSON from the response (in case LLM added text)
+            json_pattern = r'(\{[\s\S]*\})'
+            match = re.search(json_pattern, extracted_features)
+            
+            if match:
+                try:
+                    logger.info("Attempting to extract JSON from response")
+                    features = json.loads(match.group(1))
+                    return self._validate_and_fill_features(features, user_input)
+                except json.JSONDecodeError:
+                    logger.error("Failed to parse extracted JSON", exc_info=True)
+            
+            # If JSON parsing fails, raise exception to trigger fallback
+            raise ValueError("Failed to extract features from LLM response")
     
-    def _extract_features_fallback(self, user_input: str) -> Dict[str, Any]:
-        """Manual feature extraction as fallback when LLM fails."""
-        logger.info("Using fallback feature extraction")
+    def _validate_and_fill_features(self, features: Dict[str, Any], user_input: str) -> Dict[str, Any]:
+        """Validate features and fill in missing required fields."""
         
-        features = {
-            "destination": "",
-            "dates": "",
-            "duration": "",
-            "preferences": [],
-            "constraints": [],
-            "transportation": "",
-            "accommodation": "",
-            "weather_concerns": False,
-            "travel_group": ""
-        }
+        # Ensure basic structure exists
+        if not isinstance(features, dict):
+            features = {}
         
-        # Extract destination
+        # Check for required field: place_to_visit
+        if "place_to_visit" not in features or not features["place_to_visit"]:
+            logger.warning("Required field place_to_visit missing or empty - using fallback")
+            features["place_to_visit"] = self._extract_destination_fallback(user_input) or "Unknown destination"
+        
+        # Ensure lists for array fields or null if not present
+        list_fields = ["cuisine_preferences", "place_preferences"]
+        for field in list_fields:
+            if field not in features:
+                features[field] = None
+            elif features[field] and not isinstance(features[field], list):
+                features[field] = [features[field]]
+            elif features[field] is not None and not features[field]:  # Empty list
+                features[field] = None
+        
+        # Ensure duration_days is an integer or null
+        if "duration_days" in features and features["duration_days"] is not None:
+            try:
+                features["duration_days"] = int(features["duration_days"])
+            except (ValueError, TypeError):
+                features["duration_days"] = None
+        else:
+            # Try to extract from user input
+            duration = self._extract_duration_fallback(user_input)
+            if duration:
+                try:
+                    days_match = re.search(r'(\d+)', duration)
+                    if days_match:
+                        features["duration_days"] = int(days_match.group(1))
+                    else:
+                        features["duration_days"] = None
+                except:
+                    features["duration_days"] = None
+            else:
+                features["duration_days"] = None
+        
+        # Handle transport_preferences
+        if "transport_preferences" not in features:
+            features["transport_preferences"] = None
+            
+        return features
+    
+    def _extract_destination_fallback(self, user_input: str) -> str:
+        """Extract destination as fallback when LLM fails."""
         destination_patterns = [
             r'to\s+([A-Za-z\s]+)(?:,|\s+in|\s+for|\s+on|\.)',
             r'visiting\s+([A-Za-z\s]+)(?:,|\s+in|\s+for|\s+on|\.)',
             r'trip\s+to\s+([A-Za-z\s]+)(?:,|\s+in|\s+for|\s+on|\.)',
-            r'vacation\s+in\s+([A-Za-z\s]+)(?:,|\s+for|\s+on|\.)',
-            r'travel(?:ing)?\s+to\s+([A-Za-z\s]+)(?:,|\s+in|\s+for|\s+on|\.)'
+            r'vacation\s+in\s+([A-Za-z\s]+)(?:,|\s+in|\s+for|\s+on|\.)',
+            r'travel(?:ing)?\s+to\s+([A-Za-z\s]+)(?:,|\s+in|\s+for|\s+on|\.)',
+            r'itinerary\s+for\s+([A-Za-z\s]+)(?:,|\s+in|\s+for|\s+on|\.)',
+            r'plan\s+(?:a|my)?\s+(?:trip|visit)\s+(?:to)?\s+([A-Za-z\s]+)(?:,|\s+in|\s+for|\s+on|\.)'
         ]
         
         for pattern in destination_patterns:
             match = re.search(pattern, user_input, re.IGNORECASE)
             if match:
-                features["destination"] = match.group(1).strip()
-                break
+                return match.group(1).strip()
         
-        # Extract duration
+        return "Unknown destination"  # Default value if no pattern matches
+    
+    def _extract_duration_fallback(self, user_input: str) -> str:
+        """Extract duration as fallback when LLM fails."""
         duration_patterns = [
             r'(\d+)\s+day(?:s)?',
             r'(\d+)-day',
@@ -124,64 +178,79 @@ class SearchQueryExtractor:
         for pattern in duration_patterns:
             match = re.search(pattern, user_input, re.IGNORECASE)
             if match:
-                features["duration"] = f"{match.group(1)} days"
-                break
+                return f"{match.group(1)} days"
         
-        # Extract dates (simplified)
-        date_patterns = [
-            r'(?:in|during|on)\s+(January|February|March|April|May|June|July|August|September|October|November|December)',
-            r'(?:in|during|on)\s+(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)',
-            r'(?:from|between)\s+([A-Za-z]+\s+\d{1,2})(?:\s*-\s*|\s+to\s+)([A-Za-z]+\s+\d{1,2})'
+        return ""  # No duration found
+    
+    def _extract_features_fallback(self, user_input: str) -> Dict[str, Any]:
+        """Manual feature extraction as fallback when LLM fails."""
+        logger.info("Using fallback feature extraction")
+        
+        features = {
+            "place_to_visit": "",
+            "duration_days": None,
+            "cuisine_preferences": None,
+            "place_preferences": None,
+            "transport_preferences": None
+        }
+        
+        # Extract place to visit (destination)
+        place_to_visit = self._extract_destination_fallback(user_input)
+        if place_to_visit and place_to_visit != "Unknown destination":
+            features["place_to_visit"] = place_to_visit
+        
+        # Extract duration
+        duration_str = self._extract_duration_fallback(user_input)
+        if duration_str:
+            days_match = re.search(r'(\d+)', duration_str)
+            if days_match:
+                features["duration_days"] = int(days_match.group(1))
+        
+        # Extract cuisine preferences
+        cuisine_keywords = [
+            'food', 'cuisine', 'restaurant', 'dining', 'eat', 'meal',
+            'breakfast', 'lunch', 'dinner', 'snack', 'cafe', 'wine',
+            'beer', 'drink', 'bar', 'pub', 'street food', 'local food',
+            'traditional food', 'culinary', 'gastronomy', 'thai food'
         ]
         
-        for pattern in date_patterns:
-            match = re.search(pattern, user_input, re.IGNORECASE)
-            if match:
-                if len(match.groups()) == 1:
-                    features["dates"] = match.group(1)
-                elif len(match.groups()) == 2:
-                    features["dates"] = f"{match.group(1)} to {match.group(2)}"
-                break
+        cuisine_matches = []
+        for keyword in cuisine_keywords:
+            if re.search(r'\b' + keyword + r'[s]?\b', user_input, re.IGNORECASE):
+                cuisine_matches.append(keyword)
         
-        # Extract preferences
-        preference_keywords = [
-            'museum', 'art', 'history', 'beach', 'hiking', 'nature', 'food', 'dining',
-            'restaurant', 'shopping', 'nightlife', 'adventure', 'relax', 'culture',
-            'sightseeing', 'tour', 'local', 'authentic', 'park', 'festival', 'concert',
-            'sport', 'outdoor', 'photography'
+        if cuisine_matches:
+            features["cuisine_preferences"] = cuisine_matches
+        
+        # Extract place preferences
+        place_keywords = [
+            'museum', 'art', 'history', 'beach', 'hiking', 'nature',
+            'shopping', 'nightlife', 'adventure', 'relax', 'culture',
+            'sightseeing', 'tour', 'park', 'festival', 'concert',
+            'sport', 'outdoor', 'photography', 'historical', 'site',
+            'monument', 'temple', 'church', 'cathedral', 'palace',
+            'castle', 'ruin', 'ancient', 'market', 'water sport',
+            'water sports', 'night market', 'activity', 'beaches'
         ]
         
-        for keyword in preference_keywords:
-            if re.search(r'\b' + keyword + r'(\w*)\b', user_input, re.IGNORECASE):
-                features["preferences"].append(keyword)
+        place_matches = []
+        for keyword in place_keywords:
+            if re.search(r'\b' + keyword + r'[s]?\b', user_input, re.IGNORECASE):
+                place_matches.append(keyword)
         
-        # Extract travel group
-        group_patterns = [
-            (r'\b(?:with|and)\s+(?:my)?\s*family\b', 'family'),
-            (r'\b(?:with|and)\s+(?:my)?\s*kids\b', 'family with kids'),
-            (r'\b(?:with|and)\s+(?:my)?\s*child(?:ren)?\b', 'family with kids'),
-            (r'\b(?:with|and)\s+(?:my)?\s*partner\b', 'couple'),
-            (r'\b(?:with|and)\s+(?:my)?\s*spouse\b', 'couple'),
-            (r'\b(?:with|and)\s+(?:my)?\s*husband\b', 'couple'),
-            (r'\b(?:with|and)\s+(?:my)?\s*wife\b', 'couple'),
-            (r'\b(?:with|and)\s+(?:my)?\s*girlfriend\b', 'couple'),
-            (r'\b(?:with|and)\s+(?:my)?\s*boyfriend\b', 'couple'),
-            (r'\b(?:with|and)\s+friends\b', 'friends'),
-            (r'\bsolo\b', 'solo'),
-            (r'\balone\b', 'solo'),
-            (r'\bby myself\b', 'solo')
+        if place_matches:
+            features["place_preferences"] = place_matches
+        
+        # Extract transport preferences
+        transport_keywords = [
+            'transport', 'bus', 'train', 'subway', 'metro', 'taxi',
+            'car', 'rental', 'bike', 'walking', 'public transport',
+            'tram', 'ferry', 'boat', 'scooter', 'motorcycle'
         ]
         
-        for pattern, group_type in group_patterns:
-            if re.search(pattern, user_input, re.IGNORECASE):
-                features["travel_group"] = group_type
-                break
-        
-        # Weather concerns
-        weather_keywords = ['weather', 'rain', 'temperature', 'hot', 'cold', 'humid', 'snow', 'sunny', 'warm']
-        for keyword in weather_keywords:
-            if re.search(r'\b' + keyword + r'\b', user_input, re.IGNORECASE):
-                features["weather_concerns"] = True
+        for keyword in transport_keywords:
+            if re.search(r'\b' + keyword + r'[s]?\b', user_input, re.IGNORECASE):
+                features["transport_preferences"] = keyword
                 break
         
         return features

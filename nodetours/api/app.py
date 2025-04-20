@@ -2,6 +2,7 @@
 import os
 import yaml
 import logging
+import re
 from typing import Dict, Any, List
 from pathlib import Path
 from fastapi import FastAPI, Request, HTTPException
@@ -66,12 +67,52 @@ async def create_plan(user_input: UserInput):
         if not user_input.text:
             return JSONResponse(content={"error": "Input text cannot be empty"}, status_code=400)
         
+        # Process the input with our agent - no validation requirements
         result = agent.process_input(user_input.text)
+        
+        # Check for trip_details
+        trip_details = result.get("trip_details", {})
+        if trip_details:
+            logger.info(f"Trip details: {trip_details}")
         
         # Verify the result contains the necessary fields
         if not result.get("itinerary"):
             logger.warning("No itinerary was generated in the result")
             result["itinerary"] = "I couldn't generate a detailed itinerary based on your input. Please provide more specific travel details like destination, dates, and preferences."
+            
+        # Verify the itinerary has the correct number of days
+        itinerary = result.get("itinerary", "")
+        trip_details = result.get("trip_details", {})
+        expected_days = trip_details.get("duration_days", 0)
+        
+        if expected_days > 0 and itinerary:
+            # Count day headers in the itinerary
+            import re
+            day_headers = re.findall(r'## Day \d+', itinerary)
+            day_count = len(day_headers)
+            
+            logger.info(f"Expected {expected_days} days, found {day_count} day headers")
+            
+            # If we have a significant mismatch, log a warning
+            if day_count < expected_days:
+                logger.warning(f"Itinerary has fewer days than requested. Expected: {expected_days}, Found: {day_count}")
+                # We'll still return what we have, as the frontend will handle the display
+            
+        # Log each component for debugging purposes
+        logger.info(f"Generated itinerary length: {len(result.get('itinerary', ''))}")
+        logger.info(f"Generated packing list length: {len(result.get('packing_list', ''))}")
+        
+        # Specifically check the budget content
+        budget = result.get("estimated_budget", "")
+        logger.info(f"Generated budget length: {len(budget)}")
+        logger.info(f"Budget excerpt: {budget[:100]}...")
+        
+        # Make sure budget is properly formatted for the frontend
+        if budget and "Budget Estimate" not in budget:
+            # Try to add a title if it's missing
+            logger.warning("Budget estimate is missing a title, adding one")
+            destination = trip_details.get("destination", "Your Trip")
+            result["estimated_budget"] = f"### Budget Estimate for {destination}\n\n{budget}"
         
         logger.info("Successfully generated travel plan")
         return JSONResponse(content=result)

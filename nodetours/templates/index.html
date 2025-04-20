@@ -70,8 +70,9 @@
                 </div>
             </div>
         </main>
-        <button id="download-ics-btn" onclick="generateICS()">📅 Download Itinerary (.ics)</button>
-        <!-- <button onclick="generateICS()">Download Itinerary</button> -->
+        <div class="calendar-download-container">
+            <button id="download-ics-btn" style="display: none;">📅 Download Itinerary Calendar (.ics)</button>
+        </div>
                 <script>
                     // Helper function to format date to iCalendar format (YYYYMMDDTHHMMSS)
                     function formatDateToICS(date) {

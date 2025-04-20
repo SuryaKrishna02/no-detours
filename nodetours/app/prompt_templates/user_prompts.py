@@ -10,15 +10,11 @@ def query_generation_prompt(features: dict) -> str:
     return f"""
     Generate search queries based on these travel features:
     
-    Destination: {features.get('destination', 'Not specified')}
-    Dates: {features.get('dates', 'Not specified')}
-    Duration: {features.get('duration', 'Not specified')}
-    Preferences: {', '.join(features.get('preferences', [])) or 'Not specified'}
-    Constraints: {', '.join(features.get('constraints', [])) or 'Not specified'}
-    Transportation: {features.get('transportation', 'Not specified')}
-    Accommodation: {features.get('accommodation', 'Not specified')}
-    Weather concerns: {'Yes' if features.get('weather_concerns', False) else 'No'}
-    Travel group: {features.get('travel_group', 'Not specified')}
+    Place to visit: {features.get('place_to_visit', 'Not specified')}
+    Duration (days): {features.get('duration_days') or 'Not specified'}
+    Cuisine preferences: {', '.join(features.get('cuisine_preferences', []) or []) or 'Not specified'}
+    Place preferences: {', '.join(features.get('place_preferences', []) or []) or 'Not specified'}
+    Transport preferences: {features.get('transport_preferences') or 'Not specified'}
     """
 
 def itinerary_generation_prompt(features: dict, context: dict) -> str:
@@ -32,20 +28,17 @@ def itinerary_generation_prompt(features: dict, context: dict) -> str:
     weather_context = ""
     if context.get("weather_info"):
         weather = context["weather_info"]
-        weather_context = f"Weather forecast for {features.get('destination', '')}: {weather}"
+        weather_context = f"Weather forecast for {features.get('place_to_visit', '')}: {weather}"
     
     return f"""
     Please create a travel itinerary for me based on the following information:
     
     ## My Travel Details
-    Destination: {features.get('destination', 'Not specified')}
-    Dates: {features.get('dates', 'Not specified')}
-    Duration: {features.get('duration', 'Not specified')}
-    Preferences: {', '.join(features.get('preferences', [])) or 'Not specified'}
-    Constraints: {', '.join(features.get('constraints', [])) or 'Not specified'}
-    Transportation: {features.get('transportation', 'Not specified')}
-    Accommodation: {features.get('accommodation', 'Not specified')}
-    Travel group: {features.get('travel_group', 'Not specified')}
+    Destination: {features.get('place_to_visit', 'Not specified')}
+    Duration: {features.get('duration_days', 'Not specified')} days
+    Cuisine Preferences: {', '.join(features.get('cuisine_preferences', []) or []) or 'Not specified'}
+    Place Preferences: {', '.join(features.get('place_preferences', []) or []) or 'Not specified'}
+    Transport Preferences: {features.get('transport_preferences', 'Not specified')}
     
     ## Destination Information
     {search_context}
@@ -58,26 +51,24 @@ def packing_list_prompt(features: dict, weather_info: dict) -> str:
     weather_summary = str(weather_info)  # Simplified for demo
     
     return f"""
-    Please create a packing list for a trip to {features.get('destination', '')}.
+    Please create a packing list for a trip to {features.get('place_to_visit', '')}.
     
     Trip details:
-    - Duration: {features.get('duration', 'Not specified')}
+    - Duration: {features.get('duration_days', 'Not specified')} days
     - Weather: {weather_summary}
-    - Activities: {', '.join(features.get('preferences', [])) or 'Not specified'}
-    - Travel group: {features.get('travel_group', 'Not specified')}
+    - Activities: {', '.join(features.get('place_preferences', []) or []) or 'Not specified'}
+    - Food interests: {', '.join(features.get('cuisine_preferences', []) or []) or 'Not specified'}
     """
 
 def budget_estimation_prompt(features: dict) -> str:
     return f"""
-    Please estimate a budget for a trip to {features.get('destination', '')}.
+    Please estimate a budget for a trip to {features.get('place_to_visit', '')}.
     
     Trip details:
-    - Duration: {features.get('duration', 'Not specified')}
-    - Accommodation: {features.get('accommodation', 'Not specified')}
-    - Transportation: {features.get('transportation', 'Not specified')}
-    - Activities: {', '.join(features.get('preferences', [])) or 'Not specified'}
-    - Travel group: {features.get('travel_group', 'Not specified')}
-    - Constraints: {', '.join(features.get('constraints', [])) or 'Not specified'}
+    - Duration: {features.get('duration_days', 'Not specified')} days
+    - Transportation: {features.get('transport_preferences') or 'Public transportation and walking'}
+    - Activities: {', '.join(features.get('place_preferences', []) or []) or 'General sightseeing'}
+    - Food interests: {', '.join(features.get('cuisine_preferences', []) or []) or 'Local cuisine'}
     """
 
 def calendar_generation_prompt(itinerary: str, start_date: str) -> str:
@@ -93,12 +84,11 @@ def evaluation_prompt(itinerary: str, features: dict, metric: str) -> str:
     return f"""
     Here are the user's travel details:
     
-    Destination: {features.get('destination', 'Not specified')}
-    Dates: {features.get('dates', 'Not specified')}
-    Duration: {features.get('duration', 'Not specified')}
-    Preferences: {', '.join(features.get('preferences', [])) or 'Not specified'}
-    Constraints: {', '.join(features.get('constraints', [])) or 'Not specified'}
-    Travel group: {features.get('travel_group', 'Not specified')}
+    Destination: {features.get('place_to_visit', 'Not specified')}
+    Duration: {features.get('duration_days', 'Not specified')} days
+    Cuisine Preferences: {', '.join(features.get('cuisine_preferences', []) or []) or 'Not specified'}
+    Place Preferences: {', '.join(features.get('place_preferences', []) or []) or 'Not specified'}
+    Transport Preferences: {features.get('transport_preferences', 'Not specified')}
     
     Here is the generated itinerary:
     

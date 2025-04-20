@@ -144,7 +144,7 @@ class TravelPlannerAgent:
     
     def _generate_fallback_itinerary(self, features: Dict[str, Any]) -> str:
         """Generate a fallback itinerary if the main generation fails."""
-        destination = features.get("destination", "your destination")
+        destination = features.get("place_to_visit", "your destination")
         
         fallback = f"""
 # Travel Itinerary for {destination}
@@ -166,7 +166,7 @@ Please provide more details about your trip for a customized itinerary including
     
     def _generate_fallback_packing_list(self, features: Dict[str, Any]) -> str:
         """Generate a fallback packing list if the main generation fails."""
-        destination = features.get("destination", "your destination")
+        destination = features.get("place_to_visit", "your destination")
         
         fallback = f"""
 # Packing Essentials for {destination}
@@ -203,7 +203,7 @@ For a more specific packing list, please provide details about your travel seaso
     
     def _generate_fallback_budget(self, features: Dict[str, Any]) -> str:
         """Generate a fallback budget if the main generation fails."""
-        destination = features.get("destination", "your destination")
+        destination = features.get("place_to_visit", "your destination")
         
         fallback = f"""
 # Budget Estimate for {destination}

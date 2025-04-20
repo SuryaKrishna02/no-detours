@@ -12,12 +12,12 @@ class ContextCollector:
         self.weather_api = weather_api
         self.maps_api = maps_api
     
-    def collect_context(self, queries: List[str], features: Dict[str, Any]) -> Dict[str, Any]:
+    def collect_context(self, queries: List[Dict[str, str]], features: Dict[str, Any]) -> Dict[str, Any]:
         """
         Collect context information based on search queries and features.
         
         Args:
-            queries: List of search queries
+            queries: List of dictionaries containing feature type, value, and search query
             features: Extracted travel features
             
         Returns:
@@ -30,28 +30,33 @@ class ContextCollector:
         }
         
         # Collect search results
-        for query in queries:
-            results = self.search_api.search(query, num_results=3)
+        for query_obj in queries:
+            search_query = query_obj.get("search_query", "")
+            if not search_query:
+                continue
+                
+            results = self.search_api.search(search_query, num_results=3)
             context["search_results"].append({
-                "query": query,
+                "feature_type": query_obj.get("feature_type", ""),
+                "feature_value": query_obj.get("feature_value", ""),
+                "query": search_query,
                 "results": results
             })
         
         # Collect weather information if available
-        if self.weather_api and features.get("destination") and features.get("dates"):
+        if self.weather_api and features.get("place_to_visit"):
             try:
                 weather_info = self.weather_api.get_forecast(
-                    location=features["destination"],
-                    dates=features["dates"]
+                    location=features["place_to_visit"]
                 )
                 context["weather_info"] = weather_info
             except Exception as e:
                 print(f"Error fetching weather information: {e}")
         
         # Collect map information if available
-        if self.maps_api and features.get("destination"):
+        if self.maps_api and features.get("place_to_visit"):
             try:
-                map_info = self.maps_api.get_location_info(features["destination"])
+                map_info = self.maps_api.get_location_info(features["place_to_visit"])
                 context["map_info"] = map_info
             except Exception as e:
                 print(f"Error fetching map information: {e}")
