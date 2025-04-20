@@ -25,7 +25,7 @@ class SearchAPI:
         
         logger.info(f"Initialized SearchAPI with provider: {self.provider}")
     
-    def search(self, query: str, num_results: int = 5) -> List[Dict[str, Any]]:
+    def search(self, query: str, num_results: int = 2) -> List[Dict[str, Any]]:
         """
         Perform a web search using the specified provider.
         
@@ -45,19 +45,26 @@ class SearchAPI:
                     "num": num_results
                 }
                 
-                response = requests.get("https://serpapi.com/search", params=params)
+                #response = requests.get("https://serpapi.com/search", params=params)
                 
-                if response.status_code == 200:
-                    data = response.json()
+                from serpapi import GoogleSearch
+                search = GoogleSearch(params)
+                data = search.get_dict()
+                #response = results["organic_results"]
+
+
+                #if response.status_code == 200:
+                if data["search_metadata"]["status"] == "Success":
+                    #data = response.json()
                     results = []
                     
                     # Extract organic results
                     if "organic_results" in data:
-                        for result in data["organic_results"][:num_results]:
+                        for result in data["organic_results"]:
                             results.append({
-                                "title": result.get("title", ""),
-                                "link": result.get("link", ""),
-                                "snippet": result.get("snippet", "")
+                                
+                                "link": result.get("link", "")
+                                
                             })
                     
                     if results:
