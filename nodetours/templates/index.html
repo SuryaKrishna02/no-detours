@@ -1,0 +1,144 @@
+<!-- templates/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NoDetours - Personalized Travel Planner</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='/css/styles.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <h1>NoDetours</h1>
+                <p>Your AI Travel Planning Assistant</p>
+            </div>
+        </header>
+
+        <main>
+            <div class="input-section">
+                <h2>Tell me about your travel plans</h2>
+                <form id="travel-form">
+                    <textarea id="user-input" placeholder="I'm planning a trip to Chicago for 4 days in June with my family. We enjoy museums, parks, and trying local food. We'll be traveling with two kids (ages 8 and 12)."></textarea>
+                    <button type="submit" id="submit-btn">
+                        <i class="fas fa-paper-plane"></i> Create Travel Plan
+                    </button>
+                   
+                </form>
+                
+            </div>
+
+            <div class="results-section" id="results">
+                <div class="loading-indicator" id="loading">
+                    <div class="spinner"></div>
+                    <p>Planning your perfect trip...</p>
+                </div>
+                
+                <div class="tabs">
+                    <button class="tab-btn active" data-tab="itinerary">
+                        <i class="fas fa-map-marked-alt"></i> Itinerary
+                    </button>
+                    <button class="tab-btn" data-tab="packing">
+                        <i class="fas fa-suitcase"></i> Packing List
+                    </button>
+                    <button class="tab-btn" data-tab="budget">
+                        <i class="fas fa-wallet"></i> Budget
+                    </button>
+                </div>
+                
+                <div class="tab-content">
+                    <div class="tab-pane active" id="itinerary-content">
+                        <div class="content-wrapper">
+                            <h3>Your Personalized Travel Itinerary</h3>
+                            <div class="itinerary-content" id="itinerary-text"></div>
+                        </div>
+                    </div>
+                    <div class="tab-pane" id="packing-content">
+                        <div class="content-wrapper">
+                            <h3>Packing Recommendations</h3>
+                            <div class="packing-list" id="packing-text"></div>
+                        </div>
+                    </div>
+                    <div class="tab-pane" id="budget-content">
+                        <div class="content-wrapper">
+                            <h3>Budget Estimate</h3>
+                            <div class="budget-content" id="budget-text"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+        <div class="calendar-download-container">
+            <button id="download-ics-btn" style="display: none;">📅 Download Itinerary Calendar (.ics)</button>
+        </div>
+                <script>
+                    // Helper function to format date to iCalendar format (YYYYMMDDTHHMMSS)
+                    function formatDateToICS(date) {
+                      const d = new Date(date);
+                      const year = d.getFullYear();
+                      const month = String(d.getMonth() + 1).padStart(2, "0");
+                      const day = String(d.getDate()).padStart(2, "0");
+                      const hours = String(d.getHours()).padStart(2, "0");
+                      const minutes = String(d.getMinutes()).padStart(2, "0");
+                      const seconds = String(d.getSeconds()).padStart(2, "0");
+                
+                      return `${year}${month}${day}T${hours}${minutes}${seconds}`;
+                    }
+                
+                    // Main function to generate and download ICS
+                    function generateICS() {
+                      const itineraryData = [
+                        {
+                          title: "Visit Chicago Museum",
+                          startTime: "2025-05-01T09:00:00",
+                          endTime: "2025-05-01T11:00:00",
+                          description: "Explore the exhibits at the museum."
+                        },
+                        {
+                          title: "Lunch at The Cafe",
+                          startTime: "2025-05-01T12:00:00",
+                          endTime: "2025-05-01T13:00:00",
+                          description: "Lunch at the local cafe."
+                        },
+                        {
+                          title: "Visit Navy Pier",
+                          startTime: "2025-05-01T14:00:00",
+                          endTime: "2025-05-01T17:00:00",
+                          description: "Walk around Navy Pier and enjoy the view."
+                        }
+                      ];
+                
+                      let icsContent = "BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//NoDetour//EN\n";
+                
+                      itineraryData.forEach(event => {
+                        icsContent += "BEGIN:VEVENT\n";
+                        icsContent += `SUMMARY:${event.title}\n`;
+                        icsContent += `DTSTART:${formatDateToICS(event.startTime)}\n`;
+                        icsContent += `DTEND:${formatDateToICS(event.endTime)}\n`;
+                        icsContent += `DESCRIPTION:${event.description}\n`;
+                        icsContent += `LOCATION:${event.title}\n`;
+                        icsContent += "END:VEVENT\n";
+                      });
+                
+                      icsContent += "END:VCALENDAR";
+                
+                      const blob = new Blob([icsContent], { type: "text/calendar" });
+                      const link = document.createElement('a');
+                      link.href = URL.createObjectURL(blob);
+                      link.download = "itinerary.ics";
+                      document.body.appendChild(link);
+                      link.click();
+                      document.body.removeChild(link);
+                    }
+                  </script>
+
+        <footer>
+            <p>NoDetours &copy; 2025 | Indiana University Bloomington</p>
+        </footer>
+    </div>
+
+    <script src="{{ url_for('static', path='/js/app.js') }}"></script>
+</body>
+</html>
