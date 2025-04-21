@@ -1,0 +1,502 @@
+[
+    {
+      "input_query": "Help me plan a 7-day itinerary for Paris focusing on museums, historical sites, local food, wine, and using public transport",
+      "features": {
+        "place_to_visit": "Paris",
+        "duration_days": 7,
+        "cuisine_preferences": ["local food", "wine"],
+        "place_preferences": ["museums", "historical sites"],
+        "transport_preferences": "public transport"
+      }
+    },
+    {
+      "input_query": "I need a travel plan for Bali with beach activities and water sports",
+      "features": {
+        "place_to_visit": "Bali",
+        "duration_days": null,
+        "cuisine_preferences": null,
+        "place_preferences": ["beaches", "water sports"],
+        "transport_preferences": null
+      }
+    },
+    {
+      "input_query": "Create an itinerary for Bangkok that includes trying Thai food, street food, and visits to night markets",
+      "features": {
+        "place_to_visit": "Bangkok",
+        "duration_days": null,
+        "cuisine_preferences": ["Thai food", "street food"],
+        "place_preferences": ["night markets"],
+        "transport_preferences": null
+      }
+    },
+    {
+      "input_query": "Plan my 10-day Tokyo trip with convenient public transport options to visit theme parks and shopping districts",
+      "features": {
+        "place_to_visit": "Tokyo",
+        "duration_days": 10,
+        "cuisine_preferences": null,
+        "place_preferences": ["theme parks", "shopping districts"],
+        "transport_preferences": "public transport"
+      }
+    },
+    {
+      "input_query": "Make a 14-day Rome travel plan with Italian food, pizza, pasta experiences and visits to historical sites and museums using taxis and walking",
+      "features": {
+        "place_to_visit": "Rome",
+        "duration_days": 14,
+        "cuisine_preferences": ["Italian food", "pizza", "pasta"],
+        "place_preferences": ["historical sites", "museums"],
+        "transport_preferences": ["taxi", "walking"]
+      }
+    },
+    {
+      "input_query": "Create a 5-day Amsterdam itinerary featuring museums, canals, and parks with bicycle rental and tram transportation",
+      "features": {
+        "place_to_visit": "Amsterdam",
+        "duration_days": 5,
+        "cuisine_preferences": null,
+        "place_preferences": ["museums", "canals", "parks"],
+        "transport_preferences": ["bicycle", "tram"]
+      }
+    },
+    {
+      "input_query": "Help plan my 8-day Kyoto trip with rental car transportation to visit temples, gardens, and try traditional Japanese cuisine and matcha",
+      "features": {
+        "place_to_visit": "Kyoto",
+        "duration_days": 8,
+        "cuisine_preferences": ["traditional Japanese cuisine", "matcha"],
+        "place_preferences": ["temples", "gardens"],
+        "transport_preferences": "rental car"
+      }
+    },
+    {
+      "input_query": "Plan an Istanbul vacation focusing on historical sites, bazaars, and trying seafood, kebabs, and baklava",
+      "features": {
+        "place_to_visit": "Istanbul",
+        "duration_days": null,
+        "cuisine_preferences": ["seafood", "kebabs", "baklava"],
+        "place_preferences": ["historical sites", "bazaars"],
+        "transport_preferences": null
+      }
+    },
+    {
+      "input_query": "I need an itinerary for Barcelona with taxi transportation details to visit beaches, Gaudi architecture, and tapas restaurants",
+      "features": {
+        "place_to_visit": "Barcelona",
+        "duration_days": null,
+        "cuisine_preferences": ["tapas"],
+        "place_preferences": ["beaches", "Gaudi architecture"],
+        "transport_preferences": "taxi"
+      }
+    },
+    {
+      "input_query": "Create a family-friendly 10-day New York itinerary including Broadway shows, museums, and Central Park with subway and bus transportation",
+      "features": {
+        "place_to_visit": "New York",
+        "duration_days": 10,
+        "cuisine_preferences": null,
+        "place_preferences": ["Broadway shows", "museums", "Central Park"],
+        "transport_preferences": ["subway", "bus"]
+      }
+    },
+    {
+      "input_query": "Help me plan a solo trip to Prague with architecture tours, castle visits, and craft beer and traditional Czech food tastings using public transport",
+      "features": {
+        "place_to_visit": "Prague",
+        "duration_days": null,
+        "cuisine_preferences": ["craft beer", "traditional Czech food"],
+        "place_preferences": ["architecture", "castle"],
+        "transport_preferences": "public transport"
+      }
+    },
+    {
+      "input_query": "Plan a weekend Las Vegas itinerary to visit casinos, shows, and buffets using rideshare services",
+      "features": {
+        "place_to_visit": "Las Vegas",
+        "duration_days": 2,
+        "cuisine_preferences": ["buffets"],
+        "place_preferences": ["casinos", "shows"],
+        "transport_preferences": "rideshare"
+      }
+    },
+    {
+      "input_query": "Create a 21-day honeymoon plan for Santorini with beach visits, wine tastings, and romantic dinners using a rental car",
+      "features": {
+        "place_to_visit": "Santorini",
+        "duration_days": 21,
+        "cuisine_preferences": ["wine", "romantic dinners"],
+        "place_preferences": ["beaches"],
+        "transport_preferences": "rental car"
+      }
+    },
+    {
+      "input_query": "I need a business trip itinerary for Singapore that includes hawker centers, street food options, and visits to Marina Bay and Gardens by the Bay using the MRT",
+      "features": {
+        "place_to_visit": "Singapore",
+        "duration_days": null,
+        "cuisine_preferences": ["hawker centers", "street food"],
+        "place_preferences": ["Marina Bay", "Gardens by the Bay"],
+        "transport_preferences": "MRT"
+      }
+    },
+    {
+      "input_query": "Plan a 14-day backpacking adventure through Berlin visiting historical sites, museums, beer gardens, and clubs using public transportation",
+      "features": {
+        "place_to_visit": "Berlin",
+        "duration_days": 14,
+        "cuisine_preferences": ["beer"],
+        "place_preferences": ["historical sites", "museums", "clubs"],
+        "transport_preferences": "public transportation"
+      }
+    },
+    {
+      "input_query": "Create a first-time London itinerary using public transport to visit Big Ben, the Tower of London, and try fish and chips and afternoon tea",
+      "features": {
+        "place_to_visit": "London",
+        "duration_days": null,
+        "cuisine_preferences": ["fish and chips", "afternoon tea"],
+        "place_preferences": ["Big Ben", "Tower of London"],
+        "transport_preferences": "public transport"
+      }
+    },
+    {
+      "input_query": "Help me plan a 7-day Sydney trip to visit the Opera House, Bondi Beach, and try seafood and Australian wine while using public transportation",
+      "features": {
+        "place_to_visit": "Sydney",
+        "duration_days": 7,
+        "cuisine_preferences": ["seafood", "Australian wine"],
+        "place_preferences": ["Opera House", "Bondi Beach"],
+        "transport_preferences": "public transportation"
+      }
+    },
+    {
+      "input_query": "Plan a Marrakech itinerary with vegetarian and vegan dining options to visit souks and palaces using guided tours",
+      "features": {
+        "place_to_visit": "Marrakech",
+        "duration_days": null,
+        "cuisine_preferences": ["vegetarian", "vegan"],
+        "place_preferences": ["souks", "palaces"],
+        "transport_preferences": "guided tours"
+      }
+    },
+    {
+      "input_query": "Create an Orlando vacation plan featuring theme parks, water parks, and American food options with rental car transportation",
+      "features": {
+        "place_to_visit": "Orlando",
+        "duration_days": null,
+        "cuisine_preferences": ["American food"],
+        "place_preferences": ["theme parks", "water parks"],
+        "transport_preferences": "rental car"
+      }
+    },
+    {
+      "input_query": "Plan a 3-day Venice itinerary including gondola transportation to see canals, historical sites, and try pasta and gelato",
+      "features": {
+        "place_to_visit": "Venice",
+        "duration_days": 3,
+        "cuisine_preferences": ["pasta", "gelato"],
+        "place_preferences": ["canals", "historical sites"],
+        "transport_preferences": "gondola"
+      }
+    },
+    {
+      "input_query": "I need a Cairo travel plan focusing on historical sites, pyramids, and trying local Egyptian cuisine with private driver transportation",
+      "features": {
+        "place_to_visit": "Cairo",
+        "duration_days": null,
+        "cuisine_preferences": ["local Egyptian cuisine"],
+        "place_preferences": ["historical sites", "pyramids"],
+        "transport_preferences": "private driver"
+      }
+    },
+    {
+      "input_query": "Plan a Vienna trip with coffee house experiences, classical music venues, and museum visits using trams and walking",
+      "features": {
+        "place_to_visit": "Vienna",
+        "duration_days": null,
+        "cuisine_preferences": ["coffee"],
+        "place_preferences": ["classical music venues", "museums"],
+        "transport_preferences": ["tram", "walking"]
+      }
+    },
+    {
+      "input_query": "Create a 5-day Cancun plan with beach time, snorkeling, and Mexican food and seafood using resort shuttles",
+      "features": {
+        "place_to_visit": "Cancun",
+        "duration_days": 5,
+        "cuisine_preferences": ["Mexican food", "seafood"],
+        "place_preferences": ["beaches", "snorkeling"],
+        "transport_preferences": "resort shuttles"
+      }
+    },
+    {
+      "input_query": "Plan my 6-day Rio de Janeiro Carnival visit with samba shows, beaches, and Brazilian barbecue using taxis and tour buses",
+      "features": {
+        "place_to_visit": "Rio de Janeiro",
+        "duration_days": 6,
+        "cuisine_preferences": ["Brazilian barbecue"],
+        "place_preferences": ["Carnival", "samba shows", "beaches"],
+        "transport_preferences": ["taxi", "tour bus"]
+      }
+    },
+    {
+      "input_query": "Help me create a 9-day Seoul travel itinerary with cherry blossom viewing, palace visits, Korean BBQ, and street food using the subway system",
+      "features": {
+        "place_to_visit": "Seoul",
+        "duration_days": 9,
+        "cuisine_preferences": ["Korean BBQ", "street food"],
+        "place_preferences": ["cherry blossoms", "palaces"],
+        "transport_preferences": "subway"
+      }
+    },
+    {
+      "input_query": "I need a 30-day Thailand travel plan to explore temples, beaches, islands, and try street food and curries using buses, trains, and boats",
+      "features": {
+        "place_to_visit": "Thailand",
+        "duration_days": 30,
+        "cuisine_preferences": ["street food", "curries"],
+        "place_preferences": ["temples", "beaches", "islands"],
+        "transport_preferences": ["bus", "train", "boat"]
+      }
+    },
+    {
+      "input_query": "Plan a family Dubai trip with desert safaris, waterparks, shopping malls and rental car transportation to try Arabic and international cuisine",
+      "features": {
+        "place_to_visit": "Dubai",
+        "duration_days": null,
+        "cuisine_preferences": ["Arabic cuisine", "international cuisine"],
+        "place_preferences": ["desert safaris", "waterparks", "shopping malls"],
+        "transport_preferences": "rental car"
+      }
+    },
+    {
+      "input_query": "Create a Tuscany itinerary with wine tasting, olive oil tours, and pasta making classes using a rental car to visit villages and vineyards",
+      "features": {
+        "place_to_visit": "Tuscany",
+        "duration_days": null,
+        "cuisine_preferences": ["wine", "olive oil", "pasta"],
+        "place_preferences": ["villages", "vineyards"],
+        "transport_preferences": "rental car"
+      }
+    },
+    {
+      "input_query": "Plan a 4-day Switzerland mountain hiking trip with cheese fondue, chocolate tastings, and cable car transportation",
+      "features": {
+        "place_to_visit": "Switzerland",
+        "duration_days": 4,
+        "cuisine_preferences": ["cheese fondue", "chocolate"],
+        "place_preferences": ["mountains", "hiking"],
+        "transport_preferences": "cable car"
+      }
+    },
+    {
+      "input_query": "Help create a San Francisco itinerary without needing a car to visit Golden Gate Bridge, Alcatraz, Chinatown, and try seafood and sourdough",
+      "features": {
+        "place_to_visit": "San Francisco",
+        "duration_days": null,
+        "cuisine_preferences": ["seafood", "sourdough"],
+        "place_preferences": ["Golden Gate Bridge", "Alcatraz", "Chinatown"],
+        "transport_preferences": null
+      }
+    },
+    {
+      "input_query": "Plan my 5-day Lisbon trip using public transport options to visit historical sites, try Portuguese pastries and seafood",
+      "features": {
+        "place_to_visit": "Lisbon",
+        "duration_days": 5,
+        "cuisine_preferences": ["Portuguese pastries", "seafood"],
+        "place_preferences": ["historical sites"],
+        "transport_preferences": "public transport"
+      }
+    },
+    {
+      "input_query": "Create a 7-day Paris museum tour plan with visits to the Louvre, Orsay, and Eiffel Tower while trying croissants, cheese, and wine using the metro",
+      "features": {
+        "place_to_visit": "Paris",
+        "duration_days": 7,
+        "cuisine_preferences": ["croissants", "cheese", "wine"],
+        "place_preferences": ["museums", "Louvre", "Orsay", "Eiffel Tower"],
+        "transport_preferences": "metro"
+      }
+    },
+    {
+      "input_query": "Plan a Barcelona trip with vegan restaurant options to see Sagrada Familia, Park Güell using the metro and walking",
+      "features": {
+        "place_to_visit": "Barcelona",
+        "duration_days": null,
+        "cuisine_preferences": ["vegan"],
+        "place_preferences": ["Sagrada Familia", "Park Güell"],
+        "transport_preferences": ["metro", "walking"]
+      }
+    },
+    {
+      "input_query": "Create a 2-week Japan itinerary using train travel to visit Tokyo, Kyoto, and Osaka for sushi, ramen, and temple visits",
+      "features": {
+        "place_to_visit": "Japan",
+        "duration_days": 14,
+        "cuisine_preferences": ["sushi", "ramen"],
+        "place_preferences": ["Tokyo", "Kyoto", "Osaka", "temples"],
+        "transport_preferences": "train"
+      }
+    },
+    {
+      "input_query": "Plan a 3-day Athens historical sites tour including the Acropolis, ancient agora, and trying Greek food, ouzo using public buses",
+      "features": {
+        "place_to_visit": "Athens",
+        "duration_days": 3,
+        "cuisine_preferences": ["Greek food", "ouzo"],
+        "place_preferences": ["historical sites", "Acropolis", "ancient agora"],
+        "transport_preferences": "public buses"
+      }
+    },
+    {
+      "input_query": "Help create a 10-day Morocco itinerary with local food experiences, spice markets, medinas, and desert camping using private driver and camels",
+      "features": {
+        "place_to_visit": "Morocco",
+        "duration_days": 10,
+        "cuisine_preferences": ["local food", "spices"],
+        "place_preferences": ["markets", "medinas", "desert"],
+        "transport_preferences": ["private driver", "camels"]
+      }
+    },
+    {
+      "input_query": "Plan a relaxing Hawaii beach vacation with luaus, volcanoes, and trying poke and tropical drinks using a rental jeep",
+      "features": {
+        "place_to_visit": "Hawaii",
+        "duration_days": null,
+        "cuisine_preferences": ["poke", "tropical drinks"],
+        "place_preferences": ["beaches", "luaus", "volcanoes"],
+        "transport_preferences": "rental jeep"
+      }
+    },
+    {
+      "input_query": "Create a Nepal trekking itinerary in the mountains with Himalayan views, temple visits, and trying momos and dal bhat using local guides",
+      "features": {
+        "place_to_visit": "Nepal",
+        "duration_days": null,
+        "cuisine_preferences": ["momos", "dal bhat"],
+        "place_preferences": ["mountains", "Himalayas", "temples"],
+        "transport_preferences": "local guides"
+      }
+    },
+    {
+      "input_query": "Plan an 8-day Amsterdam cycling tour itinerary with canal cruises, museum visits, and trying Dutch cheese and stroopwafels",
+      "features": {
+        "place_to_visit": "Amsterdam",
+        "duration_days": 8,
+        "cuisine_preferences": ["Dutch cheese", "stroopwafels"],
+        "place_preferences": ["canals", "museums"],
+        "transport_preferences": ["cycling", "canal cruises"]
+      }
+    },
+    {
+      "input_query": "Create a New York anniversary trip with fine dining experiences at Michelin-starred restaurants, Broadway shows, and Central Park visits using the subway",
+      "features": {
+        "place_to_visit": "New York",
+        "duration_days": null,
+        "cuisine_preferences": ["fine dining", "Michelin-starred restaurants"],
+        "place_preferences": ["Broadway shows", "Central Park"],
+        "transport_preferences": "subway"
+      }
+    },
+    {
+      "input_query": "Help plan my 12-day India sightseeing itinerary to visit the Taj Mahal, temples, and try authentic curry and street food using trains and rickshaws",
+      "features": {
+        "place_to_visit": "India",
+        "duration_days": 12,
+        "cuisine_preferences": ["curry", "street food"],
+        "place_preferences": ["sightseeing", "Taj Mahal", "temples"],
+        "transport_preferences": ["train", "rickshaw"]
+      }
+    },
+    {
+      "input_query": "Plan a 5-day London trip to see Buckingham Palace, the British Museum, and try traditional afternoon tea and pub food using the Underground",
+      "features": {
+        "place_to_visit": "London",
+        "duration_days": 5,
+        "cuisine_preferences": ["afternoon tea", "pub food"],
+        "place_preferences": ["Buckingham Palace", "British Museum"],
+        "transport_preferences": "Underground"
+      }
+    },
+    {
+      "input_query": "Create a Rome historical sites tour using public transport to visit the Colosseum, Vatican, and try authentic pasta and gelato",
+      "features": {
+        "place_to_visit": "Rome",
+        "duration_days": null,
+        "cuisine_preferences": ["pasta", "gelato"],
+        "place_preferences": ["historical sites", "Colosseum", "Vatican"],
+        "transport_preferences": "public transport"
+      }
+    },
+    {
+      "input_query": "Plan a 7-day Kenya safari itinerary to see wildlife, Maasai villages, and try local barbecue with off-road vehicles and walking tours",
+      "features": {
+        "place_to_visit": "Kenya",
+        "duration_days": 7,
+        "cuisine_preferences": ["local barbecue"],
+        "place_preferences": ["safari", "wildlife", "Maasai villages"],
+        "transport_preferences": ["off-road vehicles", "walking tours"]
+      }
+    },
+    {
+      "input_query": "Create a Florida beach vacation with seafood experiences, theme parks, and everglades tours using a rental car",
+      "features": {
+        "place_to_visit": "Florida",
+        "duration_days": null,
+        "cuisine_preferences": ["seafood"],
+        "place_preferences": ["beaches", "theme parks", "everglades"],
+        "transport_preferences": "rental car"
+      }
+    },
+    {
+      "input_query": "Plan a two-week Australia travel itinerary to see Sydney, Great Barrier Reef, and try seafood and Australian wines using domestic flights and car rental",
+      "features": {
+        "place_to_visit": "Australia",
+        "duration_days": 14,
+        "cuisine_preferences": ["seafood", "Australian wines"],
+        "place_preferences": ["Sydney", "Great Barrier Reef"],
+        "transport_preferences": ["domestic flights", "car rental"]
+      }
+    },
+    {
+      "input_query": "Help create an Italy travel plan to visit Rome, Venice, Florence and try pizza, pasta, and gelato using trains between cities",
+      "features": {
+        "place_to_visit": "Italy",
+        "duration_days": null,
+        "cuisine_preferences": ["pizza", "pasta", "gelato"],
+        "place_preferences": ["Rome", "Venice", "Florence"],
+        "transport_preferences": "train"
+      }
+    },
+    {
+      "input_query": "Plan a 10-day New Zealand sightseeing itinerary to explore mountains, fjords, and try local lamb dishes and wines with a campervan rental",
+      "features": {
+        "place_to_visit": "New Zealand",
+        "duration_days": 10,
+        "cuisine_preferences": ["lamb", "wines"],
+        "place_preferences": ["sightseeing", "mountains", "fjords"],
+        "transport_preferences": "campervan"
+      }
+    },
+    {
+      "input_query": "Help me plan a 3-day trip to Paris with public transportation to visit museums, the Eiffel Tower and try local cuisine, wine, and pastries",
+      "features": {
+        "place_to_visit": "Paris",
+        "duration_days": 3,
+        "cuisine_preferences": ["local cuisine", "wine", "pastries"],
+        "place_preferences": ["museums", "Eiffel Tower"],
+        "transport_preferences": "public transportation"
+      }
+    },
+    {
+      "input_query": "Plan an 11-day Greece island hopping trip to visit beaches, ruins, and try fresh seafood, olives, and Greek wine using ferries and local buses",
+      "features": {
+        "place_to_visit": "Greece",
+        "duration_days": 11,
+        "cuisine_preferences": ["seafood", "olives", "Greek wine"],
+        "place_preferences": ["islands", "beaches", "ruins"],
+        "transport_preferences": ["ferry", "local bus"]
+      }
+    }
+  ]

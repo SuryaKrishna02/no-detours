@@ -592,16 +592,15 @@ function formatItinerary(text) {
                         
                         // Remove leading dash, stars, and spaces
                         const formattedActivity = activity
-                            .replace(/^-\s*/, '')
-                            .replace(/^\*\s*/, '')
-                            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                            .replace(/^[-*•]\s*/g, '')  // Remove -, *, or • followed by optional spaces
+                            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // Bold markdown to <strong>
                             .trim();
                         
                         // Only add if it's non-empty and not just the timeblock
                         if (formattedActivity && 
                             !formattedActivity.includes(`**${timeBlock}**`) && 
                             formattedActivity !== timeBlock) {
-                            formattedHTML += `<div class="activity-item">• ${formattedActivity}</div>`;
+                            formattedHTML += `<div class="activity-item">${formattedActivity}</div>`;
                         }
                     });
                     
@@ -637,7 +636,7 @@ function formatItinerary(text) {
                 let content = sectionMatch[1].trim();
                 
                 // Format bullet points
-                content = content.replace(/- (.*?)(?=\n|$)/g, '<div class="info-item">• $1</div>');
+                content = content.replace(/-(.*?)(?=\n|$)/g, '<div class="info-item"><span>$1</span></div>');
                 // Bold text
                 content = content.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
                 // Line breaks
@@ -839,7 +838,7 @@ function formatItinerary(text) {
             .replace(/# (.*?)(?=\n|$)/, '<h1>$1</h1>')
             .replace(/## (.*?)(?=\n|$)/g, '<h2>$1</h2>')
             .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-            .replace(/- (.*?)(?=\n|$)/g, '<div class="list-item">• $1</div>')
+            .replace(/- (.*?)(?=\n|$)/g, '<div class="list-item">$1</div>')
             .replace(/\n/g, '<br>');
             
         return formatted;
@@ -1101,7 +1100,7 @@ function formatDefault(text) {
         .replace(/#### (.*?)(?:\n|$)/g, '<h4>$1</h4>')
         .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
         .replace(/\*(.*?)\*/g, '<em>$1</em>')
-        .replace(/- (.*?)(?=\n|$)/g, '<div class="list-item">• $1</div>')
+        .replace(/- (.*?)(?=\n|$)/g, '<div class="list-item">$1</div>')
         .replace(/\n/g, '<br>');
 }
     
