@@ -8,7 +8,6 @@ pyyaml>=6.0.1
 requests>=2.31.0
 pytest>=7.4.3
 openai>=1.3.0
-serpapi>=0.1.0
 api
 requests>=2.31.0
 python-dotenv>=1.0.0
@@ -19,3 +18,4 @@ dotenv
 pandas
 openpyxl
 Jinja2
+google-search-results

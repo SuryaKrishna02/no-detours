@@ -1,0 +1,32 @@
+[
+    {
+      "input_query": "Help me plan a 7-day itinerary for Paris focusing on museums, historical sites, local food, wine, and using public transport"
+    },
+    {
+      "input_query": "I need a travel plan for Bali with beach activities and water sports"
+    },
+    {
+      "input_query": "Create an itinerary for Bangkok that includes trying Thai food, street food, and visits to night markets"
+    },
+    {
+      "input_query": "Plan my 10-day Tokyo trip with convenient public transport options to visit theme parks and shopping districts"
+    },
+    {
+      "input_query": "Make a 14-day Rome travel plan with Italian food, pizza, pasta experiences and visits to historical sites and museums using taxis and walking"
+    },
+    {
+      "input_query": "Create a 5-day Amsterdam itinerary featuring museums, canals, and parks with bicycle rental and tram transportation"
+    },
+    {
+        "input_query": "Help plan my 8-day Kyoto trip with rental car transportation to visit temples, gardens, and try traditional Japanese cuisine and matcha"
+      },
+      {
+        "input_query": "Plan an Istanbul vacation focusing on historical sites, bazaars, and trying seafood, kebabs, and baklava"
+      },
+      {
+        "input_query": "I need an itinerary for Barcelona with taxi transportation details to visit beaches, Gaudi architecture, and tapas restaurants"
+      },
+      {
+        "input_query": "Create a family-friendly 10-day New York itinerary including Broadway shows, museums, and Central Park with subway and bus transportation"
+      }
+]

@@ -1,8 +1,6 @@
 # main.py
-import os
 import yaml
 import argparse
-import uvicorn
 from dotenv import load_dotenv
 from app.agent import TravelPlannerAgent
 

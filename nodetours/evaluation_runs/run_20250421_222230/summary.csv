@@ -1,0 +1,4 @@
+Provider,accuracy,relevance,completeness,usefulness,creativity,overall
+openai_gpt35,8.4,8.7,7.7,8.4,7.8,8.2
+openai_gpt4o_mini,9.0,8.9,8.1,8.8,7.8,8.52
+anthropic_claude_35,9.0,8.8,8.2,8.8,7.8,8.52

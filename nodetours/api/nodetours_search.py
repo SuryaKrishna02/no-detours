@@ -25,7 +25,7 @@ class SearchAPI:
         
         logger.info(f"Initialized SearchAPI with provider: {self.provider}")
     
-    def search(self, query: str, num_results: int = 2) -> List[Dict[str, Any]]:
+    def search(self, query: str, num_results: int = 1) -> List[Dict[str, Any]]:
         """
         Perform a web search using the specified provider.
         

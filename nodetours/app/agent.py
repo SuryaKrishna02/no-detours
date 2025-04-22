@@ -75,7 +75,7 @@ class TravelPlannerAgent:
         self.last_itinerary = ""
         self.last_features = {}
     
-    def process_input(self, user_input: str) -> Dict[str, Any]:
+    def process_input(self, user_input: str, eval:bool=False) -> Dict[str, Any]:
         """
         Process user input and generate travel plans.
         
@@ -130,6 +130,15 @@ class TravelPlannerAgent:
                 "role": "assistant",
                 "content": output.get("itinerary", "")
             })
+
+            if eval:
+                eval_output = {
+                    "features": features,
+                    "queries": queries,
+                    "context": context,
+                    "output": output
+                }
+                return eval_output
             
             return output
         

@@ -54,7 +54,7 @@ class LLMProvider:
         
         try:
             if self.provider == "anthropic":
-                messages = [{"role": "system", "content": system_prompt}]
+                messages = []
                 
                 # Add conversation history
                 for message in conversation_history:
@@ -65,9 +65,10 @@ class LLMProvider:
                 
                 response = self.client.messages.create(
                     model=self.model,
-                    messages=messages,
+                    max_tokens=self.max_tokens,
                     temperature=self.temperature,
-                    max_tokens=self.max_tokens
+                    system=system_prompt,
+                    messages=messages
                 )
                 
                 return response.content[0].text
