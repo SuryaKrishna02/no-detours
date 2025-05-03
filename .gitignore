@@ -151,6 +151,7 @@ no-detour-venv/
 .mypy_cache/
 .dmypy.json
 dmypy.json
+.google-cookie
 
 # Pyre type checker
 .pyre/

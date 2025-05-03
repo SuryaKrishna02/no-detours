@@ -560,9 +560,7 @@ class OutputGenerator:
                     context.append(f"Information about: {query}")
                     
                 for result in results:
-                    title = result.get("title", "")
-                    snippet = result.get("snippet", "")
-                    context.append(f"- {title}: {snippet}")
+                    context.append(f"- Website: {result}")
                 context.append("")  # Add blank line between query groups
         
         return "\n".join(context)

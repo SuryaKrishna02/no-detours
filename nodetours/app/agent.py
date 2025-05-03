@@ -54,9 +54,7 @@ class TravelPlannerAgent:
             provider=api_config.get("maps", {}).get("provider", "googlemaps")
         )
         
-        self.search_api = SearchAPI(
-            provider=api_config.get("search", {}).get("provider", "serpapi")
-        )
+        self.search_api = SearchAPI()
         
         # Initialize modules
         self.query_extractor = SearchQueryExtractor(self.llm_provider)
