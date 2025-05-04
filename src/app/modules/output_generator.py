@@ -1,16 +1,39 @@
-# app/modules/output_generator.py
+"""
+app/modules/output_generator.py
+
+This module generates detailed travel itineraries and related content based on user preferences.
+It handles the creation of itineraries, packing lists, and budget estimates using LLM providers.
+"""
+
+import re
 import logging
 from typing import Dict, List, Any
 from api.llm_provider import LLMProvider
-
+from datetime import datetime, timedelta
+        
 # Set up logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 class OutputGenerator:
-    """Generates travel itineraries and recommendations."""
+    """
+    Generates travel itineraries and recommendations.
+    
+    This class is responsible for creating detailed travel plans, packing lists,
+    and budget estimates based on extracted features and contextual information.
+    It uses an LLM provider to generate natural language content.
+    
+    Attributes:
+        llm_provider (LLMProvider): The language model provider for text generation.
+    """
     
     def __init__(self, llm_provider: LLMProvider):
+        """
+        Initialize the OutputGenerator with an LLM provider.
+        
+        Args:
+            llm_provider (LLMProvider): The language model provider for text generation.
+        """
         self.llm_provider = llm_provider
         logger.info("Initialized Output generator with provider")
     
@@ -18,14 +41,27 @@ class OutputGenerator:
                           features: Dict[str, Any], 
                           context: Dict[str, Any]) -> Dict[str, Any]:
         """
-        Generate a travel itinerary based on features and context.
+        Generate a complete travel itinerary based on extracted features and context.
+        
+        Creates a detailed day-by-day itinerary that incorporates user preferences,
+        destination information, weather data, and location context. Also generates
+        supplementary information like packing lists and budget estimates.
         
         Args:
-            features: Extracted travel features
-            context: Collected context information
+            features: Extracted travel preferences including destination, duration,
+                     cuisine preferences, place preferences, and transport preferences.
+            context: Collected context information including search results, weather data,
+                    and location details.
             
         Returns:
-            Dict with generated itinerary
+            Dictionary containing the generated itinerary, packing list, estimated budget,
+            and trip details with the following structure:
+            {
+                "itinerary": str,  # The main day-by-day travel plan
+                "packing_list": str,  # Suggested items to pack
+                "estimated_budget": str,  # Budget breakdown
+                "trip_details": Dict  # Trip metadata including dates
+            }
         """
         logger.info("Generating travel itinerary")
         
@@ -43,7 +79,6 @@ class OutputGenerator:
             duration_days = 3  # Default to 3 days if not specified
             
         # For compatibility with existing code, simulate start/end dates
-        from datetime import datetime, timedelta
         start_date = datetime.now() + timedelta(days=14)  # Default 2 weeks from now
         end_date = start_date + timedelta(days=duration_days)
         start_date_str = start_date.strftime('%Y-%m-%d')
@@ -244,9 +279,27 @@ class OutputGenerator:
             }
             
     def _parse_trip_dates(self, dates_str: str) -> Dict[str, Any]:
-        """Parse the trip dates string into structured date information."""
-        from datetime import datetime, timedelta
-        import re
+        """
+        Parse trip dates from various string formats into structured date information.
+        
+        Handles multiple date formats including:
+        - Standard format "YYYY-MM-DD to YYYY-MM-DD"
+        - Month and day ranges like "June 15-20" or "June 15 to June 20"
+        - Month-only mentions like "in June"
+        
+        Args:
+            dates_str: String containing date information
+            
+        Returns:
+            Dictionary with the following structure:
+            {
+                'start_date': datetime object,
+                'end_date': datetime object,
+                'start_date_str': formatted start date (YYYY-MM-DD),
+                'end_date_str': formatted end date (YYYY-MM-DD),
+                'is_specific': Boolean indicating if specific dates were found
+            }
+        """
         
         # Initialize with custom defaults for better demonstration
         # Use a date 3 months in the future for better calendar integration
@@ -401,7 +454,24 @@ class OutputGenerator:
         return result
         
     def _generate_daily_dates(self, trip_dates: Dict[str, Any], duration_days: int) -> Dict[int, str]:
-        """Generate a mapping of day numbers to dates for the itinerary."""
+        """
+        Generate a mapping of day numbers to calendar dates for the itinerary.
+        
+        Creates a dictionary where keys are day numbers (1-based) and values
+        are date strings in YYYY-MM-DD format for each day of the trip.
+        
+        Args:
+            trip_dates: Dictionary containing start_date and end_date
+            duration_days: Number of days in the itinerary
+            
+        Returns:
+            Dictionary mapping day numbers to date strings:
+            {
+                1: "2025-05-15",
+                2: "2025-05-16",
+                ...
+            }
+        """
         from datetime import datetime, timedelta
         
         daily_dates = {}
@@ -436,7 +506,21 @@ class OutputGenerator:
     def generate_packing_list(self, 
                              features: Dict[str, Any], 
                              context: Dict[str, Any]) -> str:
-        """Generate a packing list based on destination, weather, and activities."""
+        """
+        Generate a comprehensive packing list tailored to the trip.
+        
+        Creates a destination-specific packing list based on weather conditions,
+        planned activities, and trip duration. The list is formatted in Markdown
+        with clear sections and bullet points.
+        
+        Args:
+            features: Dictionary containing trip features like destination, duration,
+                     and activity preferences
+            context: Dictionary containing contextual information like weather data
+            
+        Returns:
+            Formatted packing list as a string
+        """
         logger.info("Generating packing list")
         
         system_prompt = """
@@ -473,7 +557,22 @@ class OutputGenerator:
     def estimate_budget(self, 
                        features: Dict[str, Any], 
                        context: Dict[str, Any]) -> str:
-        """Estimate a budget range based on destination and preferences."""
+        """
+        Estimate a detailed budget for the trip based on destination and preferences.
+        
+        Creates a comprehensive budget breakdown including accommodation, transportation,
+        food, activities, and miscellaneous expenses with price ranges for different
+        spending levels (budget, mid-range, luxury).
+        
+        Args:
+            features: Dictionary containing trip features like destination, duration,
+                     and preferences
+            context: Dictionary containing contextual information
+            
+        Returns:
+            Formatted budget estimate as a string with sections for different
+            expense categories and spending levels
+        """
         logger.info("Generating budget estimate")
         
         system_prompt = """
@@ -542,7 +641,19 @@ class OutputGenerator:
             return "I apologize, but I couldn't generate a budget estimate. Please try again with more specific information about your trip."
     
     def _format_search_context(self, search_results: List[Dict[str, Any]]) -> str:
-        """Format search results for the prompt."""
+        """
+        Format search results into a structured string for prompt context.
+        
+        Organizes search results by feature type and value for use in
+        prompt generation, enabling more targeted and relevant responses.
+        
+        Args:
+            search_results: List of dictionaries containing search results
+                           with feature types, values, queries, and results
+            
+        Returns:
+            Formatted string with search context information
+        """
         if not search_results:
             return "No search results available."
         
@@ -565,33 +676,57 @@ class OutputGenerator:
                 context.append("")  # Add blank line between query groups
         
         return "\n".join(context)
-    
+
     def _format_weather_context(self, weather_info: Dict[str, Any]) -> str:
-        """Format weather information for the prompt."""
-        if not weather_info:
-            return "No weather information available."
-        
-        location = weather_info.get("location", "")
-        forecasts = weather_info.get("five_day_forecast","")
-        
-        context = []
-        
-        context.append(f"5-Day Weather forecast for {location}:")
-        for forecast in forecasts:
-            day = forecast.get("day", "")
-            temp_min = forecast.get("min_temp","")
-            temp_max = forecast.get("max_temp","")
-            description = forecast.get("description", "")
-            feels_like = forecast.get("feels_like", "")
-            wind_speed = forecast.get("wind_speed")
+            """
+            Format weather information into a structured string for prompt context.
             
-            context.append(f"- Day {day}: Min Temp-{temp_min}, Max Temp-{temp_max}, Feels Like-{feels_like}, Description-{description}, Wind Speed- {wind_speed}")
-        context.append("")  # Add blank line
-        
-        return "\n".join(context)
+            Organizes weather forecast data into a readable format for use in
+            travel planning, including temperature ranges and conditions.
+            
+            Args:
+                weather_info: Dictionary containing weather data including location
+                            and five-day forecast information
+                
+            Returns:
+                Formatted string with weather information
+            """
+            if not weather_info:
+                return "No weather information available."
+            
+            location = weather_info.get("location", "")
+            forecasts = weather_info.get("five_day_forecast","")
+            
+            context = []
+            
+            context.append(f"5-Day Weather forecast for {location}:")
+            for forecast in forecasts:
+                day = forecast.get("day", "")
+                temp_min = forecast.get("min_temp","")
+                temp_max = forecast.get("max_temp","")
+                description = forecast.get("description", "")
+                feels_like = forecast.get("feels_like", "")
+                wind_speed = forecast.get("wind_speed")
+                
+                context.append(f"- Day {day}: Min Temp-{temp_min}, Max Temp-{temp_max}, Feels Like-{feels_like}, Description-{description}, Wind Speed- {wind_speed}")
+            context.append("")  # Add blank line
+            
+            return "\n".join(context)
     
     def _format_location_context(self, location_info: Dict[str, Any]) -> str:
-        """Format location information for the prompt."""
+        """
+        Format location information into a structured string for prompt context.
+        
+        Organizes location data including address and nearby places of interest
+        (attractions, restaurants, hotels) with their ratings and vicinity.
+        
+        Args:
+            location_info: Dictionary containing location data including
+                          formatted address and nearby places categorized by type
+            
+        Returns:
+            Formatted string with location information
+        """
         if not location_info:
             return "No location information available."
         

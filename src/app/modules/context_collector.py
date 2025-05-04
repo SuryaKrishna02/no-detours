@@ -1,18 +1,38 @@
-# app/modules/context_collector.py
+"""
+app/modules/context_collector.py
+
+Context collection module that gathers information from various sources using search, scraping, weather and maps APIs.
+Serves as an information aggregator for the travel planning system, fetching relevant data based on search queries and features.
+"""
+
 import logging
-from typing import Dict, List, Any
-from api.search import SearchAPI
 from api.maps import MapsAPI
+from api.search import SearchAPI
 from api.weather import WeatherAPI
+from typing import Dict, List, Any
 from api.scrape import WebScrapperAPI
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 class ContextCollector:
-    """Collects context information from various sources."""
+    """
+    Collects context information from various external sources.
     
-    def __init__(self, search_api: SearchAPI, scrape_api:WebScrapperAPI, weather_api=None, maps_api=None):
+    This class coordinates data gathering from search, scraping, weather, and maps APIs
+    to compile comprehensive context information for travel planning purposes.
+    """
+    
+    def __init__(self, search_api: SearchAPI, scrape_api: WebScrapperAPI, weather_api: WeatherAPI = None, maps_api: MapsAPI = None):
+        """
+        Initialize the ContextCollector with required API interfaces.
+        
+        Args:
+            search_api: API interface for performing web searches
+            scrape_api: API interface for web scraping
+            weather_api: Optional API interface for weather forecasts
+            maps_api: Optional API interface for geographical data
+        """
         self.search_api = search_api
         self.weather_api = weather_api
         self.maps_api = maps_api
@@ -21,14 +41,22 @@ class ContextCollector:
     
     def collect_context(self, queries: List[Dict[str, str]], features: Dict[str, Any]) -> Dict[str, Any]:
         """
-        Collect context information based on search queries and features.
+        Collect context information based on search queries and extracted features.
+        
+        This method orchestrates data collection by:
+        1. Executing web searches and scraping information
+        2. Fetching weather forecasts if available
+        3. Retrieving geographical information if available
         
         Args:
             queries: List of dictionaries containing feature type, value, and search query
-            features: Extracted travel features
+            features: Extracted travel features including destination, preferences, etc.
             
         Returns:
-            Dict with collected context information
+            Dictionary with collected context information organized by source:
+            - search_results: Information from web searches
+            - weather_info: Weather forecast data (if available)
+            - map_info: Geographical information (if available)
         """
         context = {
             "search_results": [],

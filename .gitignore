@@ -137,6 +137,8 @@ env.bak/
 venv.bak/
 no-detour-venv/
 .DS_store
+cache
+metric_plots/
 
 # Spyder project settings
 .spyderproject

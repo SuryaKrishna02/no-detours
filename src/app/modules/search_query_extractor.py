@@ -1,8 +1,14 @@
-# app/modules/search_query_extractor.py
+"""
+app/modules/search_query_extractor.py
+
+Module for extracting structured travel features from natural language user inputs.
+Provides functionality to parse and extract travel destinations, durations, preferences, and more.
+"""
+
+import re
 import json
 import logging
-import re
-from typing import Dict, Any, List, Optional, Union
+from typing import Dict, Any
 from api.llm_provider import LLMProvider
 
 # Set up logging
@@ -10,9 +16,24 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 class SearchQueryExtractor:
-    """Extracts search features from user text input."""
+    """
+    Extracts search features from user text input.
+    
+    This class is responsible for processing natural language user queries about travel plans
+    and extracting structured data about destinations, duration, preferences, etc. It uses a
+    combination of LLM-based extraction with regex-based fallbacks when needed.
+    
+    Attributes:
+        llm_provider (LLMProvider): The language model provider used for feature extraction.
+    """
     
     def __init__(self, llm_provider: LLMProvider):
+        """
+        Initialize the SearchQueryExtractor with an LLM provider.
+        
+        Args:
+            llm_provider (LLMProvider): The language model provider to use for feature extraction.
+        """
         self.llm_provider = llm_provider
         logger.info("Initialized Search Query Feature Extractor with provider")
     
@@ -20,8 +41,19 @@ class SearchQueryExtractor:
         """
         Extract relevant travel features from user input.
         
+        This method attempts to extract travel features using the LLM provider first,
+        then falls back to regex-based extraction if the LLM approach fails.
+        
+        Args:
+            user_input (str): The natural language query from the user.
+            
         Returns:
-            Dict with extracted features like place_to_visit, duration_days, cuisine_preferences, etc.
+            Dict[str, Any]: A dictionary containing the extracted features with the following keys:
+                - place_to_visit (str): The travel destination.
+                - duration_days (int, optional): Length of stay in days, or None if not specified.
+                - cuisine_preferences (List[str], optional): Food and drink preferences, or None if not specified.
+                - place_preferences (List[str], optional): Activity or place preferences, or None if not specified.
+                - transport_preferences (str or List[str], optional): Transportation preferences, or None if not specified.
         """
         logger.info("Extracting travel features from user input")
 
@@ -39,7 +71,21 @@ class SearchQueryExtractor:
             return features
     
     def _extract_with_llm(self, user_input: str) -> Dict[str, Any]:
-        """Extract features using LLM."""
+        """
+        Extract features using the LLM provider.
+        
+        This method prompts the LLM to extract structured travel features from the user's
+        natural language query.
+        
+        Args:
+            user_input (str): The natural language query from the user.
+            
+        Returns:
+            Dict[str, Any]: A dictionary containing the extracted features.
+            
+        Raises:
+            ValueError: If the LLM response cannot be parsed as valid JSON.
+        """
         system_prompt = """
         You are a feature extraction system for a travel planning assistant.
         Your task is to identify and extract key travel information from user input.
@@ -99,7 +145,20 @@ class SearchQueryExtractor:
             raise ValueError("Failed to extract features from LLM response")
     
     def _validate_and_fill_features(self, features: Dict[str, Any], user_input: str) -> Dict[str, Any]:
-        """Validate features and fill in missing required fields."""
+        """
+        Validate features and fill in missing required fields.
+        
+        This method ensures that the extracted features dictionary has the correct structure
+        and all required fields. It also processes the feature values to ensure they are in
+        the expected format (e.g., lists for array fields, integers for numeric fields).
+        
+        Args:
+            features (Dict[str, Any]): The raw extracted features dictionary.
+            user_input (str): The original user query, used for fallback extraction if needed.
+            
+        Returns:
+            Dict[str, Any]: The validated and processed features dictionary.
+        """
         
         # Ensure basic structure exists
         if not isinstance(features, dict):
@@ -136,7 +195,7 @@ class SearchQueryExtractor:
                         features["duration_days"] = int(days_match.group(1))
                     else:
                         features["duration_days"] = None
-                except:
+                except Exception:
                     features["duration_days"] = None
             else:
                 features["duration_days"] = None
@@ -148,7 +207,18 @@ class SearchQueryExtractor:
         return features
     
     def _extract_destination_fallback(self, user_input: str) -> str:
-        """Extract destination as fallback when LLM fails."""
+        """
+        Extract destination as fallback when LLM fails.
+        
+        This method uses regex patterns to extract the travel destination from the user's
+        query when the LLM-based extraction fails.
+        
+        Args:
+            user_input (str): The natural language query from the user.
+            
+        Returns:
+            str: The extracted destination, or "Unknown destination" if no match is found.
+        """
         destination_patterns = [
             r'to\s+([A-Za-z\s]+)(?:,|\s+in|\s+for|\s+on|\.)',
             r'visiting\s+([A-Za-z\s]+)(?:,|\s+in|\s+for|\s+on|\.)',
@@ -167,7 +237,18 @@ class SearchQueryExtractor:
         return "Unknown destination"  # Default value if no pattern matches
     
     def _extract_duration_fallback(self, user_input: str) -> str:
-        """Extract duration as fallback when LLM fails."""
+        """
+        Extract duration as fallback when LLM fails.
+        
+        This method uses regex patterns to extract the trip duration from the user's
+        query when the LLM-based extraction fails.
+        
+        Args:
+            user_input (str): The natural language query from the user.
+            
+        Returns:
+            str: The extracted duration (e.g., "7 days"), or an empty string if no match is found.
+        """
         duration_patterns = [
             r'(\d+)\s+day(?:s)?',
             r'(\d+)-day',
@@ -184,7 +265,18 @@ class SearchQueryExtractor:
         return ""  # No duration found
     
     def _extract_features_fallback(self, user_input: str) -> Dict[str, Any]:
-        """Manual feature extraction as fallback when LLM fails."""
+        """
+        Manual feature extraction as fallback when LLM fails.
+        
+        This method uses regex-based approaches to extract travel features from the user's
+        query when the LLM-based extraction fails completely.
+        
+        Args:
+            user_input (str): The natural language query from the user.
+            
+        Returns:
+            Dict[str, Any]: A dictionary containing the extracted features.
+        """
         logger.info("Using fallback feature extraction")
         
         features = {

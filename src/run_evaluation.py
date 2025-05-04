@@ -1,23 +1,18 @@
-#!/usr/bin/env python
 """
-Travel Planner Evaluation Pipeline
+run_evaluation.py
 
-This script runs the entire evaluation pipeline:
-1. Loads test data from the feature extractor data file
-2. Runs evaluation on all LLM providers
-3. Generates a comprehensive report
-4. Provides a summary of results
+Travel Planner Evaluation Pipeline orchestrates assessment of different LLM providers for travel planning tasks.
+It handles test data loading, evaluation execution, result analysis, and comprehensive reporting generation.
 """
 
 import os
+import json
+import yaml
 import logging
 import argparse
-import json
-from dotenv import load_dotenv
-import yaml
 import pandas as pd
 from datetime import datetime
-
+from dotenv import load_dotenv
 from evaluator import TravelAgentEvaluator
 from generate_report import EvaluationReportGenerator
 
@@ -28,13 +23,44 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-def load_config(config_path: str):
-    """Load configuration from YAML file."""
+def load_config(config_path: str) -> dict:
+    """
+    Load configuration from a YAML file.
+    
+    Parameters
+    ----------
+    config_path : str
+        Path to the YAML configuration file
+        
+    Returns
+    -------
+    dict
+        Dictionary containing configuration settings for the evaluation pipeline
+    """
     with open(config_path, 'r') as f:
         return yaml.safe_load(f)
 
-def load_test_data(data_path: str, sample_size: int = None):
-    """Load test data from JSON file."""
+def load_test_data(data_path: str, sample_size: int = None) -> list:
+    """
+    Load test data from a JSON file and extract test cases.
+    
+    Parameters
+    ----------
+    data_path : str
+        Path to the JSON file containing test data
+    sample_size : int, optional
+        Number of test cases to randomly sample (uses seed 42 for reproducibility)
+        
+    Returns
+    -------
+    list
+        List of dictionaries containing test cases with 'query' keys
+        
+    Notes
+    -----
+    The function expects a JSON file with a list of dictionaries,
+    each containing an 'input_query' field.
+    """
     try:
         with open(data_path, 'r') as f:
             data = json.load(f)
@@ -63,8 +89,24 @@ def load_test_data(data_path: str, sample_size: int = None):
         logger.error(f"Error loading test data: {str(e)}")
         return []
 
-def create_run_directory(base_dir: str = "evaluation_runs"):
-    """Create a timestamped directory for this evaluation run."""
+def create_run_directory(base_dir: str = "evaluation_runs") -> str:
+    """
+    Create a timestamped directory for the current evaluation run.
+    
+    Parameters
+    ----------
+    base_dir : str, default "evaluation_runs"
+        Base directory where the run-specific directory will be created
+        
+    Returns
+    -------
+    str
+        Path to the newly created run directory
+        
+    Notes
+    -----
+    The directory name is formatted as "run_YYYYMMDD_HHMMSS"
+    """
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     run_dir = os.path.join(base_dir, f"run_{timestamp}")
     os.makedirs(run_dir, exist_ok=True)
@@ -72,7 +114,33 @@ def create_run_directory(base_dir: str = "evaluation_runs"):
     return run_dir
 
 def main():
-    """Main entry point for the evaluation pipeline."""
+    """
+    Main entry point for the evaluation pipeline.
+    
+    This function:
+    1. Loads environment variables
+    2. Parses command line arguments
+    3. Creates a run directory for output
+    4. Loads configuration and test data
+    5. Executes the evaluation process or uses existing results
+    6. Generates comprehensive reports
+    7. Outputs a summary to the console
+    
+    Command-line Arguments
+    ---------------------
+    --config : str
+        Path to configuration file (default: 'config.yaml')
+    --data : str
+        Path to test data file (default: 'eval-data/feature_extractor_data.json')
+    --sample-size : int, optional
+        Number of test cases to sample
+    --output-dir : str
+        Base directory for evaluation outputs (default: 'evaluation_runs')
+    --skip-evaluation : flag
+        Skip evaluation and use existing results file
+    --results-file : str, optional
+        Path to existing results file (required if --skip-evaluation is used)
+    """
     # Load environment variables
     load_dotenv()
     

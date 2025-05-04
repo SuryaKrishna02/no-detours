@@ -1,4 +1,9 @@
-# nodetours_maps.py
+"""
+api/maps.py
+
+Maps API wrapper for travel planning applications. Supports Google Maps geocoding 
+with fallback to mock data when API keys are unavailable or requests fail.
+"""
 import os
 import requests
 import logging
@@ -12,9 +17,30 @@ logger = logging.getLogger(__name__)
 load_dotenv()
 
 class MapsAPI:
-    """Wrapper for maps API providers."""
+    """
+    Wrapper for maps API providers that abstracts geocoding functionality.
+    
+    Supports Google Maps API with fallback to mock data when API keys are
+    unavailable or requests fail. Designed to provide location information
+    for travel planning applications.
+    
+    Attributes:
+        provider (str): The maps API provider name ('googlemaps' or 'mock')
+        api_key (str): API key for the selected provider
+    """
     
     def __init__(self, provider: str = "googlemaps"):
+        """
+        Initialize the Maps API wrapper.
+        
+        Args:
+            provider (str, optional): The maps API provider to use.
+                                     Defaults to "googlemaps".
+        
+        Note:
+            If Google Maps is selected but no API key is found in environment
+            variables, automatically falls back to mock mode.
+        """
         self.provider = provider.lower()
         
         if self.provider == "googlemaps":
@@ -27,13 +53,20 @@ class MapsAPI:
     
     def get_location_info(self, location: str) -> Dict[str, Any]:
         """
-        Get information about a location.
+        Get geocoding information about a specified location.
+        
+        Retrieves formatted address, latitude/longitude coordinates, and
+        place ID for the specified location. Falls back to mock data if
+        the API request fails.
         
         Args:
-            location: The location (city, country)
+            location (str): The location name (city, country, etc.)
             
         Returns:
-            Dict with location information
+            Dict[str, Any]: Dictionary containing location information with keys:
+                - formatted_address: Full formatted address string
+                - location: Dict with 'lat' and 'lng' coordinates
+                - place_id: Unique identifier for the location
         """
         if self.provider == "googlemaps":
             try:
@@ -70,7 +103,19 @@ class MapsAPI:
         return self._get_mock_location_info(location)
     
     def _get_mock_location_info(self, location: str) -> Dict[str, Any]:
-        """Generate mock location information."""
+        """
+        Generate mock location information when real data is unavailable.
+        
+        Creates a consistent mock response format that matches the structure
+        of real API responses for seamless fallback.
+        
+        Args:
+            location (str): The location name to generate mock data for
+            
+        Returns:
+            Dict[str, Any]: Dictionary with mock location data using the same
+                           structure as real API responses
+        """
         logger.info(f"Generating mock location information for {location}")
         
         return {

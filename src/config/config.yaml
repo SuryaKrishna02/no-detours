@@ -18,6 +18,3 @@ apis:
   maps:
     provider: "mock"
     api_key: "${MAPS_API_KEY}"
-  search:
-    provider: "serpapi"
-    api_key: "${SERP_API_KEY}"

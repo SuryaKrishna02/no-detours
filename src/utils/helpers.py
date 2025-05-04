@@ -1,11 +1,24 @@
-# app/utils/helpers.py
+"""
+utils/helpers.py
+Utility functions for handling date parsing, formatting, and data conversion operations.
+These helpers support the travel planner application with common data manipulation tasks.
+"""
+
 import re
 import json
 from datetime import datetime
-from typing import Dict, Any, List, Optional
+from typing import Dict, Any, Optional
 
 def parse_date_string(date_str: str) -> Optional[datetime]:
-    """Parse a date string into a datetime object."""
+    """
+    Parse a date string into a datetime object using multiple common formats.
+    
+    Args:
+        date_str (str): The date string to parse
+        
+    Returns:
+        Optional[datetime]: A datetime object if parsing succeeds, None otherwise
+    """
     date_formats = [
         "%Y-%m-%d",
         "%m/%d/%Y",
@@ -25,7 +38,19 @@ def parse_date_string(date_str: str) -> Optional[datetime]:
     return None
 
 def extract_date_range(dates_str: str) -> Dict[str, datetime]:
-    """Extract start and end dates from a date range string."""
+    """
+    Extract start and end dates from a date range string.
+    
+    Attempts to identify date ranges separated by common delimiters or 
+    extract up to two dates using regular expressions.
+    
+    Args:
+        dates_str (str): String containing date range information
+        
+    Returns:
+        Dict[str, datetime]: Dictionary with 'start_date' and 'end_date' keys,
+                             values are datetime objects or None if parsing fails
+    """
     result = {
         "start_date": None,
         "end_date": None
@@ -54,7 +79,18 @@ def extract_date_range(dates_str: str) -> Dict[str, datetime]:
     return result
 
 def format_itinerary_as_html(itinerary: str) -> str:
-    """Format a text itinerary as HTML for better display."""
+    """
+    Convert a plain text itinerary to HTML format for improved display.
+    
+    Converts newlines to <br> tags, formats day headings, and converts
+    bullet lists to HTML unordered lists.
+    
+    Args:
+        itinerary (str): Plain text itinerary
+        
+    Returns:
+        str: HTML-formatted version of the itinerary
+    """
     # Replace newlines with <br>
     html = itinerary.replace('\n', '<br>')
     
@@ -69,8 +105,38 @@ def format_itinerary_as_html(itinerary: str) -> str:
     return html
 
 def safe_json_loads(json_str: str, default_value: Any = None) -> Any:
-    """Safely load a JSON string with a default fallback."""
+    """
+    Safely parse a JSON string with a fallback default value on error.
+    
+    Args:
+        json_str (str): JSON string to parse
+        default_value (Any, optional): Value to return if parsing fails.
+                                      Defaults to None (returns empty dict if None)
+        
+    Returns:
+        Any: Parsed JSON object or default value on failure
+    """
     try:
         return json.loads(json_str)
     except json.JSONDecodeError:
         return default_value if default_value is not None else {}
+    
+def set_to_list_converter(obj):
+    """
+    Custom JSON serializer for handling set objects.
+    
+    Converts Python set objects to lists for JSON serialization.
+    Used as the 'default' parameter in json.dumps().
+    
+    Args:
+        obj: Object to convert
+        
+    Returns:
+        list: List representation of a set
+        
+    Raises:
+        TypeError: If the object is not a set
+    """
+    if isinstance(obj, set):
+        return list(obj)
+    raise TypeError(f"Object of type {type(obj).__name__} is not JSON serializable")

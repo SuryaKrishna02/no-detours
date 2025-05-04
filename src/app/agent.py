@@ -1,32 +1,43 @@
-# app/agent.py
-from typing import Dict, List, Any
-import logging
+"""
+app/agent.py
 
-from api.llm_provider import LLMProvider
-from api.search import SearchAPI
+Travel Planner Agent orchestrator module that coordinates the end-to-end travel planning process.
+This module integrates various components to generate personalized travel plans from user queries.
+"""
+
+import logging
 from api.maps import MapsAPI 
+from api.search import SearchAPI
+from typing import Dict, List, Any
 from api.weather import WeatherAPI
 from api.scrape import WebScrapperAPI
+from api.llm_provider import LLMProvider
+from app.modules.guardrail import Guardrail
+from app.modules.output_generator import OutputGenerator
+from app.modules.context_collector import ContextCollector
 from app.modules.search_query_extractor import SearchQueryExtractor
 from app.modules.search_query_generator import SearchQueryGenerator
-from app.modules.context_collector import ContextCollector
-from app.modules.output_generator import OutputGenerator
-from app.modules.guardrail import Guardrail
-
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 class TravelPlannerAgent:
-    """Main Travel Planner Agent class that orchestrates the planning process."""
+    """
+    Main Travel Planner Agent class that orchestrates the end-to-end planning process.
+    
+    This class integrates multiple components to extract features from user queries,
+    generate relevant search queries, collect contextual information, and produce
+    comprehensive travel plans with itineraries, packing lists, and budget estimates.
+    """
     
     def __init__(self, config: Dict[str, Any]):
         """
         Initialize the Travel Planner Agent with configuration.
         
         Args:
-            config: Configuration dictionary
+            config: Configuration dictionary containing LLM and API settings
+                   with provider details, model names, and parameters
         """
         logger.info("Initializing TravelPlannerAgent")
         
@@ -38,12 +49,9 @@ class TravelPlannerAgent:
             temperature=llm_config.get("temperature", 0.7),
             max_tokens=llm_config.get("max_tokens", 4000)
         )
-
-        logger.info("Initializing TravelPlannerAgent")
         
         # Initialize APIs with real implementations
         api_config = config.get("apis", {})
-
         
         self.weather_api = WeatherAPI(
             provider=api_config.get("weather", {}).get("provider", "openweathermap")
@@ -75,15 +83,24 @@ class TravelPlannerAgent:
         self.last_itinerary = ""
         self.last_features = {}
     
-    def process_input(self, user_input: str, eval:bool=False) -> Dict[str, Any]:
+    def process_input(self, user_input: str, eval: bool = False) -> Dict[str, Any]:
         """
-        Process user input and generate travel plans.
+        Process user input and generate comprehensive travel plans.
+        
+        This method implements the full pipeline: validating input, extracting features,
+        generating search queries, collecting context, and creating travel plans with
+        fallback mechanisms if any component fails.
         
         Args:
-            user_input: The user's text input
+            user_input: The user's text input containing travel preferences
+            eval: Flag indicating whether to return evaluation data structure
+                  instead of just the travel plan output
             
         Returns:
-            Dict with generated travel plans and recommendations
+            If eval=False: Dictionary with generated travel plans including itinerary,
+                          packing list, and budget estimation
+            If eval=True: Dictionary with features, queries, context, and output for
+                         evaluation purposes
         """
         logger.info("Processing user input")
         
@@ -158,7 +175,18 @@ class TravelPlannerAgent:
             }
     
     def _generate_fallback_itinerary(self, features: Dict[str, Any]) -> str:
-        """Generate a fallback itinerary if the main generation fails."""
+        """
+        Generate a fallback itinerary if the main generation fails.
+        
+        Creates a basic template itinerary based on the destination
+        when the primary itinerary generation process encounters an error.
+        
+        Args:
+            features: Dictionary of extracted features from the user query
+            
+        Returns:
+            Formatted string containing a basic itinerary template
+        """
         destination = features.get("place_to_visit", "your destination")
         
         fallback = f"""
@@ -180,7 +208,18 @@ Please provide more details about your trip for a customized itinerary including
         return fallback.strip()
     
     def _generate_fallback_packing_list(self, features: Dict[str, Any]) -> str:
-        """Generate a fallback packing list if the main generation fails."""
+        """
+        Generate a fallback packing list if the main generation fails.
+        
+        Creates a generic packing list based on the destination
+        when the primary packing list generation encounters an error.
+        
+        Args:
+            features: Dictionary of extracted features from the user query
+            
+        Returns:
+            Formatted string containing a basic packing list
+        """
         destination = features.get("place_to_visit", "your destination")
         
         fallback = f"""
@@ -217,7 +256,18 @@ For a more specific packing list, please provide details about your travel seaso
         return fallback.strip()
     
     def _generate_fallback_budget(self, features: Dict[str, Any]) -> str:
-        """Generate a fallback budget if the main generation fails."""
+        """
+        Generate a fallback budget if the main generation fails.
+        
+        Creates a generic budget estimate framework based on the destination
+        when the primary budget generation process encounters an error.
+        
+        Args:
+            features: Dictionary of extracted features from the user query
+            
+        Returns:
+            Formatted string containing a basic budget estimate template
+        """
         destination = features.get("place_to_visit", "your destination")
         
         fallback = f"""
@@ -240,9 +290,12 @@ For a detailed budget estimate, please provide information about your accommodat
     
     def get_conversation_history(self) -> List[Dict[str, str]]:
         """
-        Get the conversation history.
+        Get the conversation history between user and assistant.
+        
+        Retrieves the stored conversation messages for context-aware
+        responses in follow-up interactions.
         
         Returns:
-            List of conversation messages
+            List of conversation message dictionaries with role and content
         """
         return self.conversation_history

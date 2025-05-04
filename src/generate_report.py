@@ -1,11 +1,18 @@
-import argparse
+"""
+generate_report.py
+
+Evaluation report generator module for travel planner LLM evaluation system.
+Creates comprehensive performance reports with visualizations to compare different LLM providers.
+"""
+
+import os
 import json
 import logging
-import os
-import pandas as pd
+import argparse
 import numpy as np
-import matplotlib.pyplot as plt
+import pandas as pd
 import seaborn as sns
+import matplotlib.pyplot as plt
 from typing import Dict, List, Any
 
 # Set up logging
@@ -13,14 +20,20 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 class EvaluationReportGenerator:
-    """Generates detailed reports and visualizations from evaluation results."""
+    """
+    Generates detailed reports and visualizations from evaluation results.
+    
+    This class processes evaluation results from multiple LLM providers,
+    creates performance visualizations, and generates comprehensive HTML reports
+    with metric analysis and improvement suggestions.
+    """
     
     def __init__(self, results_file: str):
         """
         Initialize the report generator.
         
         Args:
-            results_file: Path to the evaluation results file
+            results_file: Path to the JSON file containing evaluation results
         """
         self.results_file = results_file
         self.results = self._load_results()
@@ -38,10 +51,11 @@ class EvaluationReportGenerator:
     
     def _load_results(self) -> Dict[str, Any]:
         """
-        Load evaluation results from the file.
+        Load evaluation results from the JSON file.
         
         Returns:
-            Evaluation results dictionary
+            Dictionary containing the evaluation results with summary and detailed data.
+            Returns empty dict if file cannot be loaded.
         """
         try:
             with open(self.results_file, 'r') as f:
@@ -52,10 +66,14 @@ class EvaluationReportGenerator:
     
     def generate_summary_table(self) -> pd.DataFrame:
         """
-        Generate a summary table of the results.
+        Generate a summary table of the evaluation results.
+        
+        Creates a DataFrame containing scores for each provider across all metrics,
+        with 'overall' metric moved to the end of the columns for better readability.
         
         Returns:
-            DataFrame with summary results
+            DataFrame with provider names and their scores for each metric.
+            Returns empty DataFrame if no summary data is available.
         """
         if not self.summary:
             return pd.DataFrame()
@@ -82,10 +100,13 @@ class EvaluationReportGenerator:
     
     def generate_heatmap(self, output_file: str = "heatmap.png") -> None:
         """
-        Generate a heatmap of provider performance across metrics.
+        Generate a heatmap visualization of provider performance across metrics.
+        
+        Creates a color-coded heatmap showing how each provider performs on each metric,
+        allowing for quick visual comparison of strengths and weaknesses.
         
         Args:
-            output_file: Path to save the heatmap
+            output_file: Path where the heatmap image will be saved
         """
         if not self.summary:
             logger.warning("No summary data available for heatmap")
@@ -122,8 +143,11 @@ class EvaluationReportGenerator:
         """
         Generate distribution plots for each metric across all providers.
         
+        Creates violin plots showing the distribution of scores for each metric,
+        revealing the variance and central tendency of provider performance.
+        
         Args:
-            output_dir: Directory to save the plots
+            output_dir: Directory where the distribution plots will be saved
         """
         if not self.detailed_results:
             logger.warning("No detailed results available for distribution plots")
@@ -176,10 +200,13 @@ class EvaluationReportGenerator:
     
     def generate_performance_by_query(self, output_file: str = "query_performance.png") -> None:
         """
-        Generate a plot showing performance by query type.
+        Generate a plot showing performance by query category.
+        
+        Creates a grouped bar chart comparing how providers perform across different
+        types of travel queries (Cultural, Beach/Water, Food, Nature/Outdoors, General).
         
         Args:
-            output_file: Path to save the plot
+            output_file: Path where the query performance plot will be saved
         """
         if not self.detailed_results:
             logger.warning("No detailed results available for query performance plot")
@@ -274,10 +301,14 @@ class EvaluationReportGenerator:
     
     def generate_improvement_suggestions(self) -> Dict[str, List[str]]:
         """
-        Generate improvement suggestions for each provider based on their weakest areas.
+        Generate improvement suggestions for each provider based on their weakest metrics.
+        
+        Analyzes provider performance to identify the 2 lowest-scoring metrics for each provider,
+        then generates specific suggestions for improvement in those areas.
         
         Returns:
-            Dictionary of improvement suggestions by provider
+            Dictionary mapping provider names to lists of improvement suggestions.
+            Returns empty dict if no summary data is available.
         """
         if not self.summary:
             logger.warning("No summary data available for improvement suggestions")
@@ -324,10 +355,14 @@ class EvaluationReportGenerator:
     
     def generate_html_report(self, output_file: str = "evaluation_report.html") -> None:
         """
-        Generate a comprehensive HTML report.
+        Generate a comprehensive HTML report of the evaluation results.
+        
+        Creates an HTML page that includes the summary table, heatmap,
+        performance by query category plot, metric distribution plots,
+        and improvement suggestions for each provider.
         
         Args:
-            output_file: Path to save the HTML report
+            output_file: Path where the HTML report will be saved
         """
         # Generate all the components
         summary_df = self.generate_summary_table()
@@ -409,8 +444,11 @@ class EvaluationReportGenerator:
         """
         Generate a full report with all components.
         
+        Creates a directory structure containing all visualization files and 
+        the HTML report, ensuring proper paths for all referenced assets.
+        
         Args:
-            output_dir: Directory to save the report files
+            output_dir: Directory where the report and all assets will be saved
         """
         # Create output directory if it doesn't exist
         os.makedirs(output_dir, exist_ok=True)
@@ -432,7 +470,12 @@ class EvaluationReportGenerator:
 
 
 def main():
-    """Main entry point."""
+    """
+    Main entry point for the report generator.
+    
+    Parses command line arguments, initializes the report generator,
+    and generates the full evaluation report.
+    """
     parser = argparse.ArgumentParser(description='Travel Planner Evaluation Report Generator')
     parser.add_argument('--results', type=str, required=True, help='Path to evaluation results JSON file')
     parser.add_argument('--output-dir', type=str, default='evaluation_report', help='Directory to save the report')

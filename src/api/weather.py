@@ -1,7 +1,13 @@
-# nodetours_weather.py
+"""
+api/weather.py
+
+Wrapper for weather API services that provides weather forecast data for travel planning.
+Supports OpenWeatherMap API with mock data fallback when API keys are unavailable.
+"""
+
 import os
-import requests
 import logging
+import requests
 from typing import Dict, Any
 from dotenv import load_dotenv
 
@@ -12,9 +18,29 @@ logger = logging.getLogger(__name__)
 load_dotenv()
 
 class WeatherAPI:
-    """Wrapper for weather API providers."""
+    """
+    Wrapper for weather API providers that retrieves forecast data.
+    
+    This class provides an interface to weather APIs, primarily OpenWeatherMap,
+    with a fallback to mock data when API credentials are unavailable.
+    
+    Attributes:
+        provider (str): The weather API provider name (e.g., "openweathermap")
+        api_key (str): The API key for authentication with the provider
+    """
     
     def __init__(self, provider: str = "openweathermap"):
+        """
+        Initialize the WeatherAPI with a specific provider.
+        
+        Args:
+            provider (str, optional): The weather API provider to use. 
+                                     Defaults to "openweathermap".
+        
+        Note:
+            Falls back to "mock" mode if the required API key is not found
+            in environment variables.
+        """
         self.provider = provider.lower()
         
         if self.provider == "openweathermap":
@@ -27,13 +53,20 @@ class WeatherAPI:
     
     def get_forecast(self, location: str) -> Dict[str, Any]:
         """
-        Get weather forecast for a location and date range.
+        Get a 5-day weather forecast for the specified location.
+        
+        Retrieves weather data from the configured provider, extracting daily
+        forecast data and formatting it consistently. Falls back to mock data
+        when the API call fails or when in mock mode.
         
         Args:
-            location: The location (city, country)
+            location (str): The location name (e.g., "Paris, France")
             
         Returns:
-            Dict with weather forecast information
+            Dict[str, Any]: A dictionary containing forecast information, with
+                           'location' and 'five_day_forecast' keys. The forecast
+                           includes daily min/max temperatures, feels-like temperature,
+                           weather description, and wind speed.
         """
         if self.provider == "openweathermap":
             try:
@@ -80,7 +113,19 @@ class WeatherAPI:
         return self._get_mock_forecast(location)
     
     def _get_mock_forecast(self, location: str) -> Dict[str, Any]:
-        """Generate mock weather forecast."""
+        """
+        Generate a mock weather forecast when actual API data is unavailable.
+        
+        This method provides consistent mock data for testing or when API
+        access is unavailable.
+        
+        Args:
+            location (str): The location for which to generate mock data
+            
+        Returns:
+            Dict[str, Any]: A dictionary with mock forecast data, using the
+                          same structure as the actual API response
+        """
         logger.info(f"Generating mock weather forecast for {location}")
         
         return {

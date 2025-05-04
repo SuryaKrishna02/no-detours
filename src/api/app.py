@@ -1,4 +1,10 @@
-# api/app.py
+"""
+api/app.py
+
+FastAPI backend for the NoDetours Travel Planner application. This file defines the API endpoints
+and initializes the TravelPlannerAgent to process user travel queries and generate travel plans.
+"""
+
 import os
 import yaml
 import logging
@@ -18,13 +24,25 @@ logger = logging.getLogger(__name__)
 # Load environment variables
 load_dotenv()
 
-# Define request models
 class UserInput(BaseModel):
+    """
+    Pydantic model for validating user input requests.
+    
+    Attributes:
+        text (str): The text input from the user describing their travel plans.
+    """
     text: str
 
-# Load configuration
 def load_config(config_path: str):
-    """Load configuration from a YAML file."""
+    """
+    Load configuration from a YAML file.
+    
+    Args:
+        config_path (str): Path to the YAML configuration file.
+        
+    Returns:
+        dict: The loaded configuration as a dictionary.
+    """
     with open(config_path, 'r') as f:
         return yaml.safe_load(f)
 
@@ -49,15 +67,45 @@ app.mount("/static", StaticFiles(directory=os.path.join(BASE_DIR, "static")), na
 # Set up templates
 templates = Jinja2Templates(directory=os.path.join(BASE_DIR, "templates"))
 
-# Define routes
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request):
-    """Serve the home page."""
+    """
+    Serve the home page of the application.
+    
+    Args:
+        request (Request): The FastAPI request object.
+        
+    Returns:
+        TemplateResponse: The rendered index.html template.
+    """
     return templates.TemplateResponse("index.html", {"request": request})
 
 @app.post("/api/plan")
 async def create_plan(user_input: UserInput):
-    """Generate a travel plan based on user input."""
+    """
+    Generate a travel plan based on user input.
+    
+    This endpoint processes the user's travel query, extracts features, performs search queries,
+    and generates a comprehensive travel plan including itinerary, packing list, and budget.
+    
+    Args:
+        user_input (UserInput): Pydantic model containing the user's travel query.
+        
+    Returns:
+        JSONResponse: A JSON response containing the generated travel plan or an error message.
+            Success: {
+                "itinerary": str,
+                "packing_list": str,
+                "estimated_budget": str,
+                "trip_details": dict
+            }
+            Error: {
+                "error": str
+            }
+    
+    Raises:
+        Exception: Any unexpected errors during plan generation are caught and returned as a 500 response.
+    """
     try:
         logger.info(f"Received request to create plan with input: {user_input.text[:50]}...")
         
@@ -122,7 +170,24 @@ async def create_plan(user_input: UserInput):
 
 @app.get("/api/history")
 async def get_history():
-    """Get conversation history."""
+    """
+    Retrieve the conversation history with the travel planning agent.
+    
+    This endpoint fetches the history of user interactions with the agent,
+    which can be used for displaying past queries and plans.
+    
+    Returns:
+        dict: A dictionary containing the conversation history or an error message.
+            Success: {
+                "history": list
+            }
+            Error: {
+                "error": str
+            }
+    
+    Raises:
+        Exception: Any unexpected errors are caught and returned as a 500 response.
+    """
     try:
         return {"history": agent.get_conversation_history()}
     except Exception as e:

@@ -1,7 +1,13 @@
-# app/modules/search_query_generator.py
+"""
+app/modules/search_query_generator.py
+
+Search query generator module that transforms extracted travel features into effective search queries.
+Utilizes an LLM provider to generate contextually relevant queries for retrieving travel information.
+"""
+
+import re
 import json
 import logging
-import re
 from typing import Dict, List, Any
 from api.llm_provider import LLMProvider
 
@@ -10,21 +16,48 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 class SearchQueryGenerator:
-    """Generates search queries based on extracted features."""
+    """
+    Generates targeted search queries based on extracted travel features.
+    
+    This class leverages an LLM to transform travel features (destination, preferences, etc.)
+    into effective search queries that will retrieve the most relevant information for 
+    travel planning. Includes fallback mechanisms for handling LLM failures.
+    
+    Attributes:
+        llm_provider (LLMProvider): The language model provider used to generate queries.
+    """
     
     def __init__(self, llm_provider: LLMProvider):
+        """
+        Initialize the Search Query Generator with an LLM provider.
+        
+        Args:
+            llm_provider (LLMProvider): The language model provider for generating queries.
+        """
         self.llm_provider = llm_provider
         logger.info("Initialized Search Query Generator with provider")
     
     def generate_queries(self, features: Dict[str, Any]) -> List[Dict[str, str]]:
         """
-        Generate a list of search queries based on extracted features.
+        Generate a list of search queries based on extracted travel features.
+        
+        This method constructs prompts for the LLM provider to generate search queries
+        for each relevant travel feature. It handles JSON parsing and provides fallback
+        mechanisms for error cases.
         
         Args:
-            features: Dict with extracted travel features
+            features (Dict[str, Any]): Dictionary containing extracted travel features
+                with keys like 'place_to_visit', 'duration_days', 'cuisine_preferences',
+                'place_preferences', and 'transport_preferences'.
             
         Returns:
-            List of dictionaries containing feature type, value, and search query
+            List[Dict[str, str]]: A list of dictionaries, each containing:
+                - 'feature_type': The type of feature (e.g., 'place_to_visit')
+                - 'feature_value': The specific value of the feature (e.g., 'Paris')
+                - 'search_query': Generated search query for this feature
+                
+        Raises:
+            No exceptions are raised; errors are logged and fallback queries are returned.
         """
         logger.info("Generating search queries based on extracted features")
         
@@ -127,7 +160,21 @@ class SearchQueryGenerator:
             return self._generate_fallback_queries(features)
     
     def _generate_fallback_queries(self, features: Dict[str, Any]) -> List[Dict[str, str]]:
-        """Generate fallback queries when LLM fails."""
+        """
+        Generate fallback search queries when LLM generation fails.
+        
+        This method creates a set of basic search queries based on available features
+        without requiring the LLM. It ensures the system can still function even when
+        the primary query generation method encounters errors.
+        
+        Args:
+            features (Dict[str, Any]): Dictionary containing extracted travel features,
+                possibly incomplete or empty.
+            
+        Returns:
+            List[Dict[str, str]]: A list of fallback query dictionaries with the same
+                structure as the main generate_queries method.
+        """
         logger.info("Using fallback query generation")
         
         queries = []

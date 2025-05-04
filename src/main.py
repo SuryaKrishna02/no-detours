@@ -1,16 +1,35 @@
-# main.py
+"""
+main.py
+
+Entry point for NoDetours Travel Planner application. Handles configuration loading
+and provides both CLI and web interface for the travel planning agent.
+"""
+
 import yaml
 import argparse
 from dotenv import load_dotenv
 from app.agent import TravelPlannerAgent
 
 def load_config(config_path: str):
-    """Load configuration from a YAML file."""
+    """
+    Load configuration from a YAML file.
+    
+    Args:
+        config_path (str): Path to the YAML configuration file
+        
+    Returns:
+        dict: Parsed configuration dictionary
+    """
     with open(config_path, 'r') as f:
         return yaml.safe_load(f)
 
 def main():
-    """Main entry point."""
+    """
+    Main entry point for the NoDetours application.
+    
+    Parses command line arguments, loads configuration, and runs either
+    the CLI interface or web application based on user preference.
+    """
     load_dotenv()
     
     parser = argparse.ArgumentParser(description='NoDetours: Personalized Travel Planner Agent')

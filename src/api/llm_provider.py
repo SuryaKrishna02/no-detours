@@ -1,4 +1,10 @@
-# api/llm_provider.py
+"""
+api/llm_provider.py
+
+This module provides a unified interface for interacting with different Large Language Model providers.
+It currently supports OpenAI and Anthropic APIs with configurable parameters.
+"""
+
 import os
 import openai
 import logging
@@ -13,9 +19,34 @@ logger = logging.getLogger(__name__)
 load_dotenv()
 
 class LLMProvider:
-    """Interface for LLM providers."""
+    """
+    Interface for interacting with different LLM providers.
+    
+    This class abstracts away the differences between various LLM APIs
+    (currently OpenAI and Anthropic) and provides a unified interface
+    for generating text completions.
+    
+    Attributes:
+        provider (str): The LLM provider name (e.g., "openai", "anthropic").
+        model (str): The specific model to use (e.g., "gpt-4", "claude-3-5-sonnet-latest").
+        temperature (float): Controls randomness in generation. Higher values mean more random completions.
+        max_tokens (int): Maximum number of tokens to generate in the response.
+        client: The initialized API client for the selected provider.
+    """
     
     def __init__(self, provider: str, model: str, temperature: float = 0.7, max_tokens: int = 4000):
+        """
+        Initialize the LLM provider interface.
+        
+        Args:
+            provider (str): The LLM provider name (e.g., "openai", "anthropic").
+            model (str): The specific model to use (e.g., "gpt-4", "claude-3-5-sonnet-latest").
+            temperature (float, optional): Controls randomness in generation. Defaults to 0.7.
+            max_tokens (int, optional): Maximum number of tokens to generate. Defaults to 4000.
+            
+        Raises:
+            ValueError: If an unsupported provider is specified.
+        """
         self.provider = provider.lower()
         self.model = model
         self.temperature = temperature
@@ -45,7 +76,23 @@ class LLMProvider:
                  system_prompt: str, 
                  user_prompt: str, 
                  conversation_history: Optional[List[Dict[str, str]]] = None) -> str:
-        """Generate a response from the LLM."""
+        """
+        Generate a response from the LLM.
+        
+        Args:
+            system_prompt (str): The system instructions or context to guide the model's behavior.
+            user_prompt (str): The user's input or query.
+            conversation_history (Optional[List[Dict[str, str]]], optional): 
+                Previous messages in the conversation. Each message should be a dictionary 
+                with 'role' and 'content' keys. Defaults to None.
+                
+        Returns:
+            str: The generated response text from the LLM.
+            
+        Raises:
+            Exception: If there's an error during the API call, the error is logged and
+                      an error message is returned.
+        """
         
         if conversation_history is None:
             conversation_history = []

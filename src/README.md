@@ -46,7 +46,6 @@ ANTHROPIC_API_KEY=your_anthropic_key
 COHERE_API_KEY=your_cohere_key
 WEATHER_API_KEY=your_weather_api_key
 MAPS_API_KEY=your_maps_api_key
-SERP_API_KEY=your_serp_api_key
 ```
 
 ## Usage

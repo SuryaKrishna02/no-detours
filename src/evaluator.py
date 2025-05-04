@@ -1,3 +1,10 @@
+"""
+evaluator.py
+
+Travel Agent Evaluator module for comparing multiple LLM providers on travel planning tasks.
+Provides functionality to evaluate responses across multiple metrics and generate visualization reports.
+"""
+
 import json
 import logging
 import numpy as np
@@ -7,20 +14,46 @@ import matplotlib.pyplot as plt
 from typing import Dict, List, Any
 from app.agent import TravelPlannerAgent
 from api.llm_provider import LLMProvider
+from utils.helpers import set_to_list_converter
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 class TravelAgentEvaluator:
-    """Evaluates multiple LLM providers for the Travel Planning Agent."""
+    """
+    Evaluates multiple LLM providers for the Travel Planning Agent.
+    
+    This class handles the evaluation process for different large language models
+    on travel planning tasks. It processes test cases through each model,
+    collects responses, judges their quality using a separate model,
+    and generates visualization reports.
+    
+    Attributes:
+        config (Dict[str, Any]): Configuration dictionary for evaluator setup
+        llm_providers (Dict[str, Any]): Configuration for each LLM provider
+        judge_llm_config (Dict[str, Any]): Configuration for the judge LLM
+        evaluation_config (Dict[str, Any]): Evaluation settings and parameters
+        judge_llm (LLMProvider): Instance of LLM used for judging responses
+        metrics (List): List of metrics used for evaluation
+        scale_min (int): Minimum value on evaluation scale
+        scale_max (int): Maximum value on evaluation scale
+        results (Dict): Storage for evaluation results
+    """
     
     def __init__(self, config: Dict[str, Any]):
         """
         Initialize the Travel Agent Evaluator.
         
+        Sets up the evaluator with the provided configuration including LLM providers,
+        judging model, evaluation metrics, and scale. Creates necessary instances
+        for processing test cases.
+        
         Args:
-            config: Configuration dictionary
+            config (Dict[str, Any]): Configuration dictionary containing:
+                - llm_providers: Configuration for each LLM to evaluate
+                - judge_llm: Configuration for the LLM used as judge
+                - evaluation: Metrics, scale, and other evaluation parameters
         """
         logger.info("Initializing TravelAgentEvaluator")
         
@@ -53,11 +86,15 @@ class TravelAgentEvaluator:
         """
         Evaluate all LLM providers with the given test cases.
         
+        Processes each test case through each LLM provider, collects responses,
+        and gets evaluations from the judge model. Handles errors gracefully
+        and maintains a structured record of all results.
+        
         Args:
-            test_cases: List of test cases
+            test_cases (List[Dict[str, Any]]): List of test cases with queries to process
             
         Returns:
-            Evaluation results
+            Dict[str, Any]: Complete evaluation results organized by provider
         """
         logger.info("Evaluating LLM providers")
         
@@ -111,27 +148,29 @@ class TravelAgentEvaluator:
         """
         Use the judge LLM to evaluate a response.
         
+        Formats the travel planning response components (features, queries, context, output)
+        into a prompt for the judge LLM to evaluate. Extracts metrics-based ratings and
+        explanations from the judge's response.
+        
         Args:
-            query: The original user query
-            response: The agent's response
-            provider_name: Name of the LLM provider
+            query (str): The original user query
+            response (Dict[str, Any]): The agent's structured response
+            provider_name (str): Name of the LLM provider being evaluated
             
         Returns:
-            Evaluation metrics
+            Dict[str, Any]: Evaluation metrics with ratings and explanations
         """
         logger.info(f"Judging response from provider: {provider_name}")
-        
-        
 
         # Extract components from the response
         features = json.dumps(response["features"], indent=2)
         queries = json.dumps(response["queries"], indent=2)
-        context = json.dumps(response["context"], indent=2)
+        context = json.dumps(response["context"], indent=2, default=set_to_list_converter)
         output = json.dumps(response["output"], indent=2)
 
         system_prompt = "You are an expert travel planner evaluator. You are judging the quality of an AI travel planning assistant."
         
-        # Construct prompt for the judge
+        # Construct prompt for the judge with dynamically loaded metric descriptions
         prompt = f"""
 ## Original User Query:
 "{query}"
@@ -151,31 +190,39 @@ class TravelAgentEvaluator:
 Please evaluate the generated travel plan based on Original User Query, Extracted Features,\\
 Generated Search Queries, Collected Context using the following metrics, \\
 on a scale from {self.scale_min} (worst) to {self.scale_max} (best):
+
 """
-        
+        # Dynamically add metric descriptions from config
         for metric in self.metrics:
-            prompt += f"- {metric.capitalize()}: Rate how well the plan performs on {metric}\n"
+            if isinstance(metric, dict):
+                metric_id = metric.get("id", "")
+                metric_name = metric.get("name", metric_id.capitalize())
+                metric_desc = metric.get("description", "")
+                prompt += f"- {metric_name}: {metric_desc}\n\n"
+            else:
+                # Handle legacy format where metrics might be simple strings
+                prompt += f"- {metric.capitalize()}: Rate how well the plan performs on {metric}\n\n"
         
         prompt += """
 Provide your ratings as a JSON object with the metrics as keys and ratings as values (integers only).
 Then provide a brief explanation for each rating.
 
 Example format:
-{{
-  "ratings": {{
+{
+  "ratings": {
     "accuracy": 8,
     "relevance": 7,
     ...
-  }},
-  "explanations": {{
+  },
+  "explanations": {
     "accuracy": "The plan accurately addresses...",
     "relevance": "The recommendations are relevant because...",
     ...
-  }}
-}}
+  }
+}
 """
-        print("Rating Prompt------------")
-        print(prompt)
+        logger.info("Rating Prompt------------")
+        logger.info(prompt)
         
         try:
             # Call the judge LLM
@@ -184,8 +231,7 @@ Example format:
                 system_prompt=system_prompt
             )
 
-            print("Came Here-------------------------")
-            print(response)
+            logger.info(response)
             
             # Extract the JSON from the response
             json_start = response.find('{')
@@ -208,11 +254,15 @@ Example format:
         """
         Generate a report from the evaluation results.
         
+        Calculates average scores across test cases for each provider and metric.
+        Computes an overall score for each provider. Optionally saves the complete
+        results to a JSON file.
+        
         Args:
-            output_file: Path to save the results
+            output_file (str, optional): Path to save the results JSON file
             
         Returns:
-            Summary of the evaluation results
+            Dict[str, Any]: Summary of the evaluation results by provider and metric
         """
         logger.info("Generating evaluation report")
         
@@ -224,15 +274,15 @@ Example format:
         summary = {}
         
         for provider, results in self.results.items():
-            provider_scores = {metric: [] for metric in self.metrics}
+            provider_scores = {metric.get("id"): [] for metric in self.metrics}
             
             for result in results:
                 if "evaluation" in result and "ratings" in result["evaluation"]:
                     ratings = result["evaluation"]["ratings"]
-                    
                     for metric in self.metrics:
-                        if metric in ratings:
-                            provider_scores[metric].append(ratings[metric])
+                        metric_name = metric.get("id")
+                        if metric_name in ratings:
+                            provider_scores[metric_name].append(ratings[metric_name])
             
             # Calculate averages
             provider_averages = {
@@ -256,7 +306,7 @@ Example format:
                     json.dump({
                         "summary": summary,
                         "detailed_results": self.results
-                    }, f, indent=2)
+                    }, f, indent=2, default=set_to_list_converter)
                 
                 logger.info(f"Results saved to {output_path}")
             except Exception as e:
@@ -268,8 +318,14 @@ Example format:
         """
         Plot the evaluation results.
         
+        Creates multiple visualization plots:
+        1. Overall comparison of providers
+        2. Metrics comparison across providers
+        3. Radar charts for each provider
+        
         Args:
-            summary: Summary of the evaluation results
+            summary (Dict[str, Dict[str, float]], optional): Summary of evaluation results.
+                If not provided, will generate from self.results
         """
         logger.info("Plotting evaluation results")
         
@@ -304,7 +360,16 @@ Example format:
         self._plot_radar_charts(df)
     
     def _plot_overall_comparison(self, df: pd.DataFrame) -> None:
-        """Plot overall comparison of providers."""
+        """
+        Plot overall comparison of providers.
+        
+        Creates a bar chart showing the overall score for each provider,
+        sorted in descending order of performance.
+        
+        Args:
+            df (pd.DataFrame): DataFrame containing the evaluation data
+                with Provider, Metric, and Score columns
+        """
         plt.figure(figsize=(12, 6))
         
         # Filter for overall metric
@@ -334,7 +399,16 @@ Example format:
         logger.info("Saved overall comparison plot to overall_comparison.png")
     
     def _plot_metrics_comparison(self, df: pd.DataFrame) -> None:
-        """Plot metrics comparison across providers."""
+        """
+        Plot metrics comparison across providers.
+        
+        Creates a grouped bar chart showing how each provider
+        performs across different evaluation metrics.
+        
+        Args:
+            df (pd.DataFrame): DataFrame containing the evaluation data
+                with Provider, Metric, and Score columns
+        """
         plt.figure(figsize=(15, 8))
         
         # Filter out overall metric
@@ -342,7 +416,7 @@ Example format:
         
         # Create grouped bar chart
         providers = df_metrics["Provider"].unique()
-        metrics = self.metrics
+        metrics = [metric.get("id") for metric in self.metrics]
         
         x = np.arange(len(metrics))
         width = 0.8 / len(providers)
@@ -370,7 +444,16 @@ Example format:
         logger.info("Saved metrics comparison plot to metrics_comparison.png")
     
     def _plot_radar_charts(self, df: pd.DataFrame) -> None:
-        """Plot radar charts for each provider."""
+        """
+        Plot radar charts for each provider.
+        
+        Creates a set of radar charts (spider/star plots) showing the
+        performance profile of each provider across all metrics.
+        
+        Args:
+            df (pd.DataFrame): DataFrame containing the evaluation data
+                with Provider, Metric, and Score columns
+        """
         # Filter out overall metric
         df_metrics = df[df["Metric"] != "overall"]
         
@@ -392,7 +475,7 @@ Example format:
                 provider_data = df_metrics[df_metrics["Provider"] == provider]
                 
                 # Prepare data for radar chart
-                metrics = self.metrics
+                metrics = {metric.get("id"): [] for metric in self.metrics}
                 scores = []
                 
                 for metric in metrics:
