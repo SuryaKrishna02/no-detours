@@ -1,0 +1,55 @@
+llm_providers:
+  openai_gpt35:
+    provider: "openai"
+    model: "gpt-3.5-turbo"
+    temperature: 0.7
+    max_tokens: 4000
+  
+  openai_gpt4o_mini:
+    provider: "openai"
+    model: "gpt-4o-mini"
+    temperature: 0.7
+    max_tokens: 4000
+
+  anthropic_claude_35:
+    provider: "anthropic"
+    model: "claude-3-5-sonnet-latest"
+    temperature: 0.7
+    max_tokens: 4000
+    
+judge_llm:
+  provider: "openai"
+  model: "gpt-4o"
+  temperature: 0.1
+  max_tokens: 4000
+
+apis:
+  weather:
+    provider: "openweathermap"
+    api_key: "${WEATHER_API_KEY}"
+  maps:
+    provider: "googlemaps"
+    api_key: "${MAPS_API_KEY}"
+
+evaluation:
+  output_file: "evaluation_results.json"
+  metrics:
+    - id: "accuracy"
+      name: "Accuracy"
+      description: "Rate how accurately the agent captures and addresses all user preferences and requirements in the travel plan, including correctly identifying destinations, durations, activities, and transportation needs."
+    - id: "relevance"
+      name: "Relevance" 
+      description: "Rate how well the recommendations align with the user's stated preferences, interests, and constraints, providing options that match their specific travel style and goals."
+    - id: "completeness"
+      name: "Completeness"
+      description: "Rate how comprehensive the travel plan is, including details on accommodations, daily itineraries, transportation between sites, opening hours, estimated costs, and practical information a traveler would need."
+    - id: "usefulness"
+      name: "Usefulness"
+      description: "Rate how practical and actionable the travel plan is for the user, including local tips, avoiding common tourist pitfalls, and providing information that would genuinely enhance their travel experience."
+    - id: "creativity"
+      name: "Creativity"
+      description: "Rate how innovative and personalized the suggestions are, going beyond obvious tourist attractions to include unique experiences, off-the-beaten-path recommendations, and thoughtful combinations of activities."
+  scale_min: 1
+  scale_max: 10
+  scale_min: 1
+  scale_max: 10
