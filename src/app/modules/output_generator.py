@@ -12,6 +12,7 @@ class OutputGenerator:
     
     def __init__(self, llm_provider: LLMProvider):
         self.llm_provider = llm_provider
+        logger.info("Initialized Output generator with provider")
     
     def generate_itinerary(self, 
                           features: Dict[str, Any], 
@@ -559,8 +560,8 @@ class OutputGenerator:
                 else:
                     context.append(f"Information about: {query}")
                     
-                for result in results:
-                    context.append(f"- Website: {result}")
+                for num, result in enumerate(results):
+                    context.append(f"- Place Name: {result['name']} and Place Description: {result['description']}")
                 context.append("")  # Add blank line between query groups
         
         return "\n".join(context)
@@ -571,37 +572,21 @@ class OutputGenerator:
             return "No weather information available."
         
         location = weather_info.get("location", "")
-        current = weather_info.get("current", {})
-        forecast = weather_info.get("forecast", [])
+        forecasts = weather_info.get("five_day_forecast","")
         
         context = []
         
-        # Current weather
-        if current:
-            temp = current.get("temp")
-            feels_like = current.get("feels_like")
-            description = current.get("description", "")
+        context.append(f"5-Day Weather forecast for {location}:")
+        for forecast in forecasts:
+            day = forecast.get("day", "")
+            temp_min = forecast.get("min_temp","")
+            temp_max = forecast.get("max_temp","")
+            description = forecast.get("description", "")
+            feels_like = forecast.get("feels_like", "")
+            wind_speed = forecast.get("wind_speed")
             
-            context.append(f"Current weather in {location}:")
-            if temp is not None:
-                context.append(f"- Temperature: {temp}°C")
-            if feels_like is not None:
-                context.append(f"- Feels like: {feels_like}°C")
-            if description:
-                context.append(f"- Conditions: {description}")
-            context.append("")  # Add blank line
-        
-        # Forecast
-        if forecast:
-            context.append(f"Weather forecast for {location}:")
-            for day in forecast:
-                date = day.get("date", "")
-                avg_temp = day.get("avg_temp")
-                description = day.get("description", "")
-                
-                if date and avg_temp is not None:
-                    context.append(f"- {date}: {avg_temp}°C, {description}")
-            context.append("")  # Add blank line
+            context.append(f"- Day {day}: Min Temp-{temp_min}, Max Temp-{temp_max}, Feels Like-{feels_like}, Description-{description}, Wind Speed- {wind_speed}")
+        context.append("")  # Add blank line
         
         return "\n".join(context)
     

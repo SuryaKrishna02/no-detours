@@ -14,6 +14,7 @@ class SearchQueryExtractor:
     
     def __init__(self, llm_provider: LLMProvider):
         self.llm_provider = llm_provider
+        logger.info("Initialized Search Query Feature Extractor with provider")
     
     def extract_features(self, user_input: str) -> Dict[str, Any]:
         """

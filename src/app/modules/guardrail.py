@@ -1,8 +1,7 @@
 # app/modules/guardrail.py
 import json
-from typing import Dict, Any, Tuple
+from typing import Tuple
 from api.llm_provider import LLMProvider
-from app.prompt_templates.system_prompts import GUARDRAIL_SYSTEM_PROMPT
 
 class Guardrail:
     """Ensures user inputs are appropriate and relevant to travel planning."""
@@ -20,8 +19,20 @@ class Guardrail:
         Returns:
             Tuple of (is_valid, reason_if_invalid)
         """
+        system_prompt="""
+You are a content moderator for a travel planning assistant.
+Your task is to determine if the user's input is:
+1. Related to travel planning or travel information
+2. Appropriate and does not contain harmful, offensive, or inappropriate content
+
+Respond with a JSON object with the following fields:
+- is_valid: true if the input passes both checks, false otherwise
+- reason: If is_valid is false, provide a brief reason
+
+Provide only the JSON, with no additional text.
+"""
         response = self.llm_provider.generate(
-            system_prompt=GUARDRAIL_SYSTEM_PROMPT,
+            system_prompt=system_prompt,
             user_prompt=user_input
         )
         

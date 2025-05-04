@@ -1,16 +1,23 @@
 # app/modules/context_collector.py
+import logging
 from typing import Dict, List, Any
-from api.nodetours_search import SearchAPI
-from api.nodetours_maps import MapsAPI
-from api.nodetours_weather import WeatherAPI
+from api.search import SearchAPI
+from api.maps import MapsAPI
+from api.weather import WeatherAPI
+from api.scrape import WebScrapperAPI
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 class ContextCollector:
     """Collects context information from various sources."""
     
-    def __init__(self, search_api: SearchAPI, weather_api=None, maps_api=None):
+    def __init__(self, search_api: SearchAPI, scrape_api:WebScrapperAPI, weather_api=None, maps_api=None):
         self.search_api = search_api
         self.weather_api = weather_api
         self.maps_api = maps_api
+        self.scrape_api = scrape_api
+        logger.info("Initialized Search Query Feature Extractor with provider")
     
     def collect_context(self, queries: List[Dict[str, str]], features: Dict[str, Any]) -> Dict[str, Any]:
         """
@@ -35,7 +42,14 @@ class ContextCollector:
             if not search_query:
                 continue
                 
-            results = self.search_api.search(search_query, num_results=3)
+            search_links = self.search_api.search(search_query, num_results=1)
+            results = []
+            for link in search_links:
+                places_info = self.scrape_api.scrape(
+                    url=link
+                )
+                results.extend(places_info)
+
             context["search_results"].append({
                 "feature_type": query_obj.get("feature_type", ""),
                 "feature_value": query_obj.get("feature_value", ""),

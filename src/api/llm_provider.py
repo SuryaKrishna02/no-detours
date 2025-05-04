@@ -1,10 +1,10 @@
 # api/llm_provider.py
 import os
-import logging
-from typing import Dict, List, Optional, Any
-import anthropic
 import openai
+import logging
+import anthropic
 from dotenv import load_dotenv
+from typing import Dict, List, Optional
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)

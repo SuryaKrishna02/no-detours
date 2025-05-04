@@ -3,13 +3,16 @@ from typing import Dict, List, Any
 import logging
 
 from api.llm_provider import LLMProvider
-from api.nodetours_search import SearchAPI
-from api.nodetours_maps import MapsAPI 
-from api.nodetours_weather import WeatherAPI
+from api.search import SearchAPI
+from api.maps import MapsAPI 
+from api.weather import WeatherAPI
+from api.scrape import WebScrapperAPI
 from app.modules.search_query_extractor import SearchQueryExtractor
 from app.modules.search_query_generator import SearchQueryGenerator
 from app.modules.context_collector import ContextCollector
 from app.modules.output_generator import OutputGenerator
+from app.modules.guardrail import Guardrail
+
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
@@ -35,16 +38,12 @@ class TravelPlannerAgent:
             temperature=llm_config.get("temperature", 0.7),
             max_tokens=llm_config.get("max_tokens", 4000)
         )
-        
-        # # Initialize APIs with mock implementations for the MVP
-        # self.search_api = SearchAPI()
-        # self.weather_api = WeatherAPI()
-        # self.maps_api = MapsAPI()
 
         logger.info("Initializing TravelPlannerAgent")
         
         # Initialize APIs with real implementations
         api_config = config.get("apis", {})
+
         
         self.weather_api = WeatherAPI(
             provider=api_config.get("weather", {}).get("provider", "openweathermap")
@@ -55,14 +54,17 @@ class TravelPlannerAgent:
         )
         
         self.search_api = SearchAPI()
+        self.scrape_api = WebScrapperAPI()
         
         # Initialize modules
+        self.guardrail = Guardrail(self.llm_provider)
         self.query_extractor = SearchQueryExtractor(self.llm_provider)
         self.query_generator = SearchQueryGenerator(self.llm_provider)
         self.context_collector = ContextCollector(
             search_api=self.search_api,
             weather_api=self.weather_api,
-            maps_api=self.maps_api
+            maps_api=self.maps_api,
+            scrape_api=self.scrape_api
         )
         self.output_generator = OutputGenerator(self.llm_provider)
         
@@ -86,6 +88,12 @@ class TravelPlannerAgent:
         logger.info("Processing user input")
         
         try:
+            # Input Validation
+            is_valid = self.guardrail.validate_input(user_input)
+            if not is_valid:
+                raise ValueError("Invalid User Input.")
+            logger.info("Validated the User Input")
+
             # 1. Extract features from user input
             features = self.query_extractor.extract_features(user_input)
             logger.info(f"Extracted features: {features}")

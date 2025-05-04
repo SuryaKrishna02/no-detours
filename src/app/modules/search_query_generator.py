@@ -14,6 +14,7 @@ class SearchQueryGenerator:
     
     def __init__(self, llm_provider: LLMProvider):
         self.llm_provider = llm_provider
+        logger.info("Initialized Search Query Generator with provider")
     
     def generate_queries(self, features: Dict[str, Any]) -> List[Dict[str, str]]:
         """

@@ -2,17 +2,14 @@
 import os
 import yaml
 import logging
-import re
-from typing import Dict, Any, List
 from pathlib import Path
-from fastapi import FastAPI, Request, HTTPException
-from fastapi.responses import HTMLResponse, JSONResponse, FileResponse
-from fastapi.staticfiles import StaticFiles
-from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
 from dotenv import load_dotenv
-
+from fastapi import FastAPI, Request
 from app.agent import TravelPlannerAgent
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
+from fastapi.responses import HTMLResponse, JSONResponse
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)

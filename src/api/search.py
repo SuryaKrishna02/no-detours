@@ -14,7 +14,7 @@ class SearchAPI:
         self.delay = delay
         logger.info("Initialized SearchAPI with provider")
     
-    def search(self, query: str, num_results: int = 3) -> List[Dict[str, Any]]:
+    def search(self, query: str, num_results: int = 1) -> List[Dict[str, Any]]:
         """
         Perform a web search using the specified provider.
         

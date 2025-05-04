@@ -18,4 +18,5 @@ dotenv
 pandas
 openpyxl
 Jinja2
-google-search-results
+google
+beautifulsoup4
